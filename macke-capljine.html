@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mačke">
+<meta name="application-name" content="Mačke">
+<meta name="theme-color" content="#6b4423">
+<link rel="manifest" href="data:application/json,{
+  &quot;name&quot;: &quot;Ma%C4%8Dke&quot;,
+  &quot;short_name&quot;: &quot;Ma%C4%8Dke&quot;,
+  &quot;display&quot;: &quot;standalone&quot;,
+  &quot;background_color&quot;: &quot;%23f5f0e8&quot;,
+  &quot;theme_color&quot;: &quot;%236b4423&quot;,
+  &quot;start_url&quot;: &quot;.&quot;
+}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mačke</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#f5f0e8;--parchment:#ede4d0;--sand:#d9c9a8;
+  --terracotta:#c0714f;--rust:#a0522d;--bark:#6b4423;
+  --ink:#2c1f0e;--warm:#faf7f2;--shadow:rgba(44,31,14,0.15);
+  --green:#7fb069;--yellow:#e9c46a;--red:#e07a5f;
+}
+body{background:var(--cream);font-family:'Lora',serif;color:var(--ink);min-height:100vh}
+.app{min-height:100vh;background:radial-gradient(ellipse at 10% 20%,rgba(192,113,79,0.08),transparent 50%),radial-gradient(ellipse at 90% 80%,rgba(122,140,94,0.07),transparent 50%),var(--cream)}
+/* HEADER */
+.header{background:linear-gradient(135deg,var(--bark),#3d2510);padding:1.6rem 1.5rem 1.2rem;text-align:center;position:sticky;top:0;z-index:100}
+.header h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,5vw,2rem);color:var(--cream);letter-spacing:.04em}
+.header p{font-style:italic;color:var(--sand);font-size:.85rem;margin-top:.2rem}
+/* NAV */
+nav{display:flex;background:var(--parchment);border-bottom:2px solid var(--sand);overflow-x:auto;scrollbar-width:none;position:sticky;top:72px;z-index:99}
+nav::-webkit-scrollbar{display:none}
+.nb{flex:none;padding:.65rem 1rem;font-family:'Lora',serif;font-size:.78rem;font-weight:600;color:var(--bark);background:none;border:none;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}
+.nb:hover{background:var(--sand)}
+.nb.active{color:var(--terracotta);border-bottom-color:var(--terracotta);background:var(--warm)}
+/* MAIN */
+.main{padding:1.4rem 1rem 5rem;max-width:900px;margin:0 auto}
+/* SECTION CARD */
+.sc{background:var(--warm);border:1px solid var(--sand);border-radius:12px;padding:1.1rem;margin-bottom:1rem;box-shadow:0 1px 4px var(--shadow)}
+.st{font-family:'Playfair Display',serif;font-size:.93rem;color:var(--bark);margin-bottom:.7rem;display:flex;align-items:center;justify-content:space-between;padding-bottom:.5rem;border-bottom:1px solid var(--parchment)}
+/* CAT GRID */
+.loc-label{font-size:.7rem;letter-spacing:.07em;text-transform:uppercase;color:var(--rust);margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem}
+.loc-label::after{content:'';flex:1;height:1px;background:var(--sand)}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.9rem;margin-bottom:1.6rem}
+.cat-card{background:var(--warm);border:1px solid var(--sand);border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 2px 8px var(--shadow)}
+.cat-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px var(--shadow)}
+.cc-photo{width:100%;height:130px;background:linear-gradient(135deg,var(--parchment),var(--sand));display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;overflow:hidden}
+.cc-photo img{width:100%;height:100%;object-fit:cover}
+.hdot{position:absolute;top:8px;right:8px;width:11px;height:11px;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.dg{background:var(--green)}.dw{background:var(--yellow)}.da{background:var(--red)}
+.cc-body{padding:.75rem .9rem}
+.cc-name{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--bark)}
+.cc-meta{font-size:.73rem;color:var(--rust);margin-top:.15rem;font-style:italic}
+.cc-w{margin-top:.4rem;font-size:.73rem;background:var(--parchment);display:inline-block;padding:.1rem .4rem;border-radius:20px}
+/* PROFILE */
+.profile{animation:fi .3s ease}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.back-btn{display:inline-flex;align-items:center;gap:.4rem;background:none;border:none;cursor:pointer;font-family:'Lora',serif;font-size:.82rem;color:var(--rust);margin-bottom:1rem;padding:.3rem 0;border-bottom:1px solid transparent;transition:border-color .2s}
+.back-btn:hover{border-bottom-color:var(--rust)}
+.ph{background:linear-gradient(135deg,var(--bark),#4a2d12);border-radius:16px;padding:1.3rem;color:var(--cream);margin-bottom:1rem;display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap}
+.pfp-wrap{position:relative;flex-shrink:0}
+.pfp-img{width:85px;height:85px;border-radius:10px;background:var(--parchment);display:flex;align-items:center;justify-content:center;font-size:2.6rem;overflow:hidden;border:3px solid rgba(255,255,255,.2)}
+.pfp-img img{width:100%;height:100%;object-fit:cover}
+.pfp-label{position:absolute;bottom:-6px;right:-6px;background:var(--terracotta);color:white;border:2px solid white;border-radius:50%;width:26px;height:26px;font-size:.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pfp-label input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;font-size:0}
+.ph-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700}
+.ph-sub{font-style:italic;color:var(--sand);font-size:.82rem;margin-top:.2rem}
+.tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.55rem}
+.tag{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:.16rem .5rem;font-size:.69rem}
+/* INFO GRID */
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.il{font-size:.67rem;text-transform:uppercase;letter-spacing:.08em;color:var(--rust)}
+.iv{font-size:.83rem;color:var(--ink);margin-top:.1rem}
+.editable{cursor:pointer;display:flex;align-items:flex-start;gap:.3rem}
+.editable span{flex:1}
+.editable::after{content:'✏️';font-size:.65rem;flex-shrink:0;margin-top:.1rem}
+/* FORMS */
+.lf{background:var(--parchment);border-radius:10px;padding:.9rem;margin-top:.7rem}
+.lf input,.lf select,.lf textarea{width:100%;font-family:'Lora',serif;font-size:.82rem;padding:.42rem .6rem;border:1px solid var(--sand);border-radius:8px;background:var(--warm);color:var(--ink);margin-bottom:.42rem;outline:none;transition:border-color .2s}
+.lf input:focus,.lf select:focus,.lf textarea:focus{border-color:var(--terracotta)}
+.lf textarea{resize:vertical;min-height:60px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.btn{font-family:'Lora',serif;font-size:.82rem;font-weight:600;padding:.42rem 1rem;border:none;border-radius:8px;cursor:pointer;transition:all .2s}
+.bp{background:var(--terracotta);color:white}.bp:hover{background:var(--rust)}
+.bs{background:var(--sand);color:var(--bark)}.bs:hover{background:var(--parchment)}
+.bd{background:none;border:1px solid var(--red);color:var(--red);font-size:.7rem;padding:.18rem .45rem;border-radius:6px;cursor:pointer}
+.bd:hover{background:#fff0ee}
+.be{background:none;border:1px solid var(--sand);color:var(--bark);font-size:.7rem;padding:.18rem .45rem;border-radius:6px;cursor:pointer}
+.be:hover{background:var(--parchment)}
+/* LOG ENTRIES */
+.le{padding:.52rem .72rem;border-left:3px solid var(--sand);margin-bottom:.52rem;background:var(--parchment);border-radius:0 8px 8px 0;font-size:.8rem}
+.le:last-child{margin-bottom:0}
+.lm{display:flex;gap:.4rem;margin-bottom:.18rem;align-items:center;flex-wrap:wrap}
+.ld{font-size:.68rem;color:var(--rust);font-style:italic}
+.lcb{font-size:.65rem;background:var(--sand);color:var(--bark);padding:.08rem .36rem;border-radius:10px;font-weight:600}
+.lcat{font-size:.65rem;padding:.08rem .36rem;border-radius:10px;font-weight:600}
+.cZdravlje{background:#fce4d6;color:#8b3a1f}.cTežina{background:#d6e8d6;color:#2d5a2d}
+.cPonašanje{background:#e8e0f0;color:#4a2d6b}.cVeterinar{background:#d6eaf8;color:#1a4d6b}
+.cLijek{background:#fef9e0;color:#7d6a00}.cBilješka{background:#f0f0f0;color:#444}
+/* FLAGS */
+.fi{display:flex;align-items:flex-start;gap:.4rem;padding:.42rem .62rem;background:#fff8e7;border:1px solid #e9c46a;border-radius:8px;font-size:.78rem;margin-bottom:.35rem;color:#7d5a00}
+/* WEIGHT */
+.wr{display:flex;justify-content:space-between;align-items:center;padding:.28rem 0;border-bottom:1px solid var(--parchment);font-size:.8rem}
+.wr:last-child{border-bottom:none}
+.wv{font-weight:600;color:var(--bark)}
+canvas{width:100%;height:80px;display:block;margin-bottom:.5rem}
+/* GALLERY */
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;margin-bottom:.6rem}
+.gthumb{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:var(--parchment);cursor:pointer}
+.gthumb img{width:100%;height:100%;object-fit:cover;transition:opacity .2s}
+.gthumb:hover img{opacity:.85}
+.gdel{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:white;border:none;border-radius:50%;width:22px;height:22px;font-size:.68rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.gadd-label{aspect-ratio:1;border-radius:8px;border:2px dashed var(--sand);display:flex;align-items:center;justify-content:center;cursor:pointer;background:var(--parchment);font-size:1.4rem;color:var(--rust);transition:background .2s;position:relative;overflow:hidden}
+.gadd-label:hover{background:var(--sand)}
+.gadd-label input{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer;font-size:0}
+/* LIGHTBOX */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;z-index:1000;cursor:pointer}
+.lightbox img{max-width:92vw;max-height:92vh;border-radius:8px;object-fit:contain}
+/* OVERVIEW */
+.ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:1rem}
+.stat{background:var(--warm);border:1px solid var(--sand);border-radius:12px;padding:.9rem;text-align:center}
+.sn{font-family:'Playfair Display',serif;font-size:1.9rem;color:var(--terracotta);font-weight:700}
+.sl{font-size:.73rem;color:var(--rust);margin-top:.15rem;font-style:italic}
+.ai{display:flex;gap:.55rem;align-items:flex-start;padding:.5rem .72rem;background:#fff8e7;border-left:3px solid var(--terracotta);border-radius:0 8px 8px 0;font-size:.78rem;margin-bottom:.42rem}
+.ac{font-weight:600;color:var(--bark);min-width:88px;flex-shrink:0}
+/* CALENDAR */
+.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
+.cal-month{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--bark)}
+.cal-nav{background:none;border:1px solid var(--sand);border-radius:8px;padding:.28rem .8rem;cursor:pointer;font-size:1rem;color:var(--bark);transition:background .2s;font-family:'Lora',serif}
+.cal-nav:hover{background:var(--sand)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:.9rem}
+.cdn{text-align:center;font-size:.6rem;font-weight:600;color:var(--rust);text-transform:uppercase;padding:.35rem 0;background:var(--parchment);border-radius:5px}
+.cd{min-height:44px;border-radius:7px;padding:.25rem .18rem;background:var(--warm);border:1px solid var(--parchment);transition:background .2s;overflow:hidden}
+.cd:not(.empty):hover{background:var(--parchment)}
+.cd.empty{background:transparent;border-color:transparent}
+.cd.today{border-color:var(--terracotta);background:#fff5f0}
+.cdn2{font-weight:600;color:var(--bark);font-size:.72rem;text-align:center}
+.cev{font-size:.5rem;background:var(--terracotta);color:white;border-radius:6px;padding:.04rem .2rem;margin-top:2px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.ev-item{display:flex;gap:.55rem;align-items:flex-start;padding:.52rem .72rem;background:var(--parchment);border-left:3px solid var(--terracotta);border-radius:0 8px 8px 0;font-size:.8rem;margin-bottom:.45rem}
+.ev-date{font-size:.7rem;color:var(--rust);font-style:italic;min-width:82px;flex-shrink:0}
+/* HIERARCHY */
+.hr-row{display:flex;align-items:center;gap:.7rem;padding:.44rem 0;border-bottom:1px solid var(--parchment);font-size:.82rem}
+.hr-row:last-child{border-bottom:none}
+.hr-rank{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--terracotta);min-width:20px;text-align:center}
+.hr-name{font-weight:600;color:var(--bark);min-width:100px}
+.hr-lbl{color:var(--rust);font-size:.74rem;font-style:italic}
+/* FILTER BTNS */
+.fbs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.9rem}
+.fb{padding:.2rem .62rem;border-radius:20px;border:1px solid var(--sand);background:var(--warm);font-family:'Lora',serif;font-size:.72rem;cursor:pointer;color:var(--bark);transition:all .2s}
+.fb.active{background:var(--terracotta);color:white;border-color:var(--terracotta)}
+.empty{text-align:center;padding:1.6rem;color:var(--rust);font-style:italic;font-size:.86rem}
+/* EDIT INLINE */
+.ei{font-family:'Lora',serif;font-size:.83rem;padding:.3rem .5rem;border:1px solid var(--terracotta);border-radius:6px;background:var(--warm);color:var(--ink);outline:none;width:100%}
+.eta{font-family:'Lora',serif;font-size:.8rem;padding:.32rem .5rem;border:1px solid var(--terracotta);border-radius:6px;background:var(--warm);color:var(--ink);outline:none;width:100%;resize:vertical;min-height:58px}
+.erow{display:flex;gap:.35rem;margin-top:.3rem}
+/* DIET */
+.diet-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.7rem}
+.appetite-row{display:flex;align-items:center;justify-content:space-between;padding:.35rem 0;border-bottom:1px solid var(--parchment);font-size:.8rem}
+.appetite-row:last-child{border-bottom:none}
+.ap-score{display:flex;gap:.3rem}
+.ap-btn{background:none;border:1px solid var(--sand);border-radius:6px;padding:.15rem .4rem;cursor:pointer;font-size:.75rem;transition:all .2s}
+.ap-btn.active{background:var(--terracotta);color:white;border-color:var(--terracotta)}
+/* VACCINE */
+.vax-row{display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--parchment);font-size:.8rem}
+.vax-row:last-child{border-bottom:none}
+.vax-name{font-weight:600;color:var(--bark);min-width:120px}
+.vax-date{color:var(--rust);font-size:.74rem;font-style:italic;flex:1}
+.vax-due{font-size:.72rem;padding:.1rem .4rem;border-radius:10px;font-weight:600}
+.vax-ok{background:#d6e8d6;color:#2d5a2d}
+.vax-soon{background:#fef9e0;color:#7d6a00}
+.vax-overdue{background:#fce4d6;color:#8b3a1f}
+/* MEDS */
+.med-active-row{display:flex;align-items:flex-start;gap:.6rem;padding:.45rem .7rem;background:#f0f7ff;border-left:3px solid #5b9bd5;border-radius:0 8px 8px 0;margin-bottom:.4rem;font-size:.8rem}
+.med-name{font-weight:600;color:var(--bark)}
+/* PARASITE */
+.par-row{display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--parchment);font-size:.8rem}
+.par-row:last-child{border-bottom:none}
+.par-name{font-weight:600;color:var(--bark);min-width:120px}
+.par-due{font-size:.72rem;padding:.1rem .4rem;border-radius:10px;font-weight:600}
+/* EXPENSE */
+.exp-row{display:flex;align-items:center;gap:.6rem;padding:.38rem 0;border-bottom:1px solid var(--parchment);font-size:.8rem}
+.exp-row:last-child{border-bottom:none}
+.exp-amt{font-weight:700;color:var(--bark);min-width:60px;text-align:right}
+.exp-cat{font-size:.66rem;padding:.08rem .36rem;border-radius:10px;font-weight:600;background:var(--parchment);color:var(--bark)}
+.exp-total{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--terracotta);font-weight:700;text-align:right;padding:.5rem 0}
+/* VET CARD */
+.vet-card{background:linear-gradient(135deg,#e8f4e8,#d6ead6);border:1px solid #b8d4b8;border-radius:10px;padding:.9rem;margin-bottom:.6rem}
+.vet-name{font-family:'Playfair Display',serif;font-size:1rem;color:var(--bark);font-weight:700}
+.vet-info{font-size:.8rem;color:var(--ink);margin-top:.3rem;line-height:1.7}
+.vet-info a{color:var(--rust);text-decoration:none}
+/* EMERGENCY CARD */
+.emergency-card{background:linear-gradient(135deg,var(--bark),#3d2510);color:var(--cream);border-radius:12px;padding:1.2rem;margin-bottom:.8rem}
+.em-title{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:.7rem;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:.4rem}
+.em-row{display:flex;gap:.5rem;font-size:.78rem;margin-bottom:.3rem}
+.em-label{opacity:.7;min-width:100px;flex-shrink:0}
+.em-val{font-weight:600}
+@media print{nav,.back-btn,.nb,.btn,.pfp-label,.gadd-label,.bdprint{display:none!important}.emergency-card{break-inside:avoid}}
+/* BIRTHDAYS */
+.bday-card{background:linear-gradient(135deg,#fff8e7,#fef0cc);border:1px solid #e9c46a;border-radius:10px;padding:.8rem 1rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.8rem}
+.bday-emoji{font-size:1.8rem;flex-shrink:0}
+.bday-name{font-weight:700;color:var(--bark);font-size:.9rem}
+.bday-sub{font-size:.75rem;color:var(--rust);font-style:italic;margin-top:.1rem}
+.bday-days{font-family:"Playfair Display",serif;font-size:1.3rem;color:var(--terracotta);font-weight:700;margin-left:auto;flex-shrink:0}
+.bday-today{background:linear-gradient(135deg,#fff0e6,#ffd9c0);border-color:var(--terracotta)}
+/* MOOD */
+.mood-row{display:flex;align-items:center;gap:.6rem;padding:.38rem 0;border-bottom:1px solid var(--parchment);font-size:.8rem}
+.mood-row:last-child{border-bottom:none}
+.mood-score{font-size:1.1rem}
+/* HIDDEN */
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <h1>🐾 Mačke 🐾</h1>
+    <p>Zdravstveni kartoni · 8 mačaka · Svaki život zabilježen</p>
+  </header>
+  <nav id="nav"></nav>
+  <main class="main" id="main"></main>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox hidden" id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+const CATS0 = [
+  {id:1,name:"Pero",emoji:"👑",spol:"Ženka",sterilizirana:true,rodjendan:"1. svibnja 2020.",gotchaDay:"",lokacija:"Glavna kuća",boja:"Smeđi/tamni tabby, masne crne pruge, crvenkasto-smeđe grudi",oci:"Žarko zelene",tezina:5.5,hijerarhija:1,hijerarhijaLabel:"Vrh — Kraljica kuće",licnost:"Naprasita, snažne volje, dominantna. Jede ostatke hrane svih mačaka, što ju je dovelo u nevolju. Apsolutno zapovijedа svim prostorom.",odnosi:"Dominira nad svima u kući. Svi to znaju.",porijeklo:"",medical:[{id:"m1",datum:"",kategorija:"Zdravlje",biljeska:"Trovanje organofosforom — dok je bila skotna. Preživjela u potpunosti, mačići neozlijeđeni."},{id:"m2",datum:"",kategorija:"Zdravlje",biljeska:"Začepljenje debelog crijeva — prejedanje tuđe hrane za odsutnosti vlasnika. Antibiotici i probiotici. Potpuno riješeno."}],zastave:["Sklona prejedanju — pratiti unos hrane za odsutnosti"],healthStatus:"watch",profilePhoto:"",photos:[],diet:{hrana:"",tip:"",raspored:"",porcija:"",favoriti:"",izbjegavati:""},cjepiva:[],lijekovi:[],paraziti:[],troskovi:[],vet:{ime:"",telefon:"",adresa:"",email:""},raspolozenje:[]},
+  {id:2,name:"Pero Jr.",emoji:"🌸",spol:"Ženka",sterilizirana:true,rodjendan:"5. svibnja 2021.",gotchaDay:"",lokacija:"Glavna kuća",boja:"Klasični tabby, topli smeđe-sivi tonovi, svjetlije grudi",oci:"Velike, okrugle, zlatno-zelene",tezina:4.5,hijerarhija:3,hijerarhijaLabel:"Sredina — slaže se sa svima",licnost:"Prijateljska i društvena. Blago plašljiva, ali u osnovi topla i mrzovoljasta. Puno blaža od majke.",odnosi:"Kći od Pero. Najbliža prijateljica Crnoj.",porijeklo:"Pero-ina kći — jedna od 4 mačića iz njezinog jedinog legla.",medical:[{id:"m3",datum:"",kategorija:"Zdravlje",biljeska:"Kaliciviroza kao mačić — blagi simptomi, čirevi u ustima. Potpuno riješeno."},{id:"m4",datum:"",kategorija:"Zdravlje",biljeska:"Ozljeda od traktora — nije mogla hodati oko 1 mjesec. Potpuni oporavak, bez neuroloških posljedica."},{id:"m5",datum:"",kategorija:"Zdravlje",biljeska:"Gubitak dlake na mjestu udarca oko 1 godinu — vjerojatno neurološki odgovor folikula. Potpuno riješeno."}],zastave:[],healthStatus:"good",profilePhoto:"",photos:[],diet:{hrana:"",tip:"",raspored:"",porcija:"",favoriti:"",izbjegavati:""},cjepiva:[],lijekovi:[],paraziti:[],troskovi:[],vet:{ime:"",telefon:"",adresa:"",email:""},raspolozenje:[]},
+  {id:3,name:"Crni",emoji:"🖤",spol:"Ženka",sterilizirana:true,rodjendan:"25. svibnja 2021.",gotchaDay:"",lokacija:"Glavna kuća",boja:"Jednobojna crna, glatka",oci:"Žarko žuto-zelene",tezina:4.8,hijerarhija:5,hijerarhijaLabel:"Niže — stabilna unutar malog kruga",licnost:"Plašljiva, povučena, introvertna. Veliki homebody. Žudi za Perinom pažnjom. Ne slaže se s većinom grupe.",odnosi:"Najbliža veza s Pero Jr. Traži Perinu pažnju. Kći Zvjezdice (Perine sestre).",porijeklo:"",medical:[{id:"m6",datum:"",kategorija:"Zdravlje",biljeska:"Kaliciviroza — zaražena u isto vrijeme kao Pero Jr. Preživjela u potpunosti."},{id:"m7",datum:"",kategorija:"Zdravlje",biljeska:"Komplikacije sterilizacije — iskidala šavove, druga operacija u anesteziji. Riješeno."},{id:"m8",datum:"Trajno",kategorija:"Zdravlje",biljeska:"Osjetljivost na mjestu reza od sterilizacije. Pratiti."}],zastave:["Osjetljivost na mjestu operacijskog reza — pratiti"],healthStatus:"watch",profilePhoto:"",photos:[],diet:{hrana:"",tip:"",raspored:"",porcija:"",favoriti:"",izbjegavati:""},cjepiva:[],lijekovi:[],paraziti:[],troskovi:[],vet:{ime:"",telefon:"",adresa:"",email:""},raspolozenje:[]},
+  {id:4,name:"Crno Bijeli",emoji:"🎭",spol:"Mužjak",sterilizirana:true,rodjendan:"25. travnja 2022.",gotchaDay:"",lokacija:"Glavna kuća",boja:"Crno-bijeli frak, čist kontrast",oci:"Zelene (obje)",tezina:6.3,hijerarhija:2,hijerarhijaLabel:"Visoko — voljen, easygoing",licnost:"Najveći ljubimac u grupi. Prede kao motor. Stalno traži pažnju. Agilan unatoč veličini. Planinar po krovovima.",odnosi:"Slaže se sa svima osim s Crnom (mirno izbjegavanje). Najbolji prijatelji s Mišom.",porijeklo:"",medical:[],zastave:["Težak za mužjaka (6,3 kg) — pratiti težinu s vremenom"],healthStatus:"watch",profilePhoto:"",photos:[],diet:{hrana:"",tip:"",raspored:"",porcija:"",favoriti:"",izbjegavati:""},cjepiva:[],lijekovi:[],paraziti:[],troskovi:[],vet:{ime:"",telefon:"",adresa:"",email:""},raspolozenje:[]},
+  {id:5,name:"Mišo",emoji:"🌊",spol:"Ženka",sterilizirana:true,rodjendan:"Nepoznat",gotchaDay:"23. lipnja",lokacija:"Glavna kuća",boja:"Smeđi tabby, masne pruge, topli narančasto-hrđasti tonovi",oci:"Žarko zelene",tezina:4.3,hijerarhija:4,hijerarhijaLabel:"Sredina — društvena, vezana uz par",licnost:"Divlje dijete s dobrim srcem. Prati te svuda. Izrazito playful i nježna.",odnosi:"Crno Bijeli — najbolji prijatelji. Jako vezana uz vlasnika. Maćkina biološka sestra (otkriveno godinu dana kasnije).",porijeklo:"Pronađena na mostu iza kuće, glasno maukala za strancima. Privremeni smještaj koji je postao trajan.",medical:[{id:"m9",datum:"Trajno",kategorija:"Zdravlje",biljeska:"Sumnja na FIC (Feline Idiopathic Cystitis) — epizode naprezanja pri mokrenju. RTG bez opstrukcije. Vjerojatno stresno inducirano."},{id:"m10",datum:"U tijeku",kategorija:"Veterinar",biljeska:"Analiza urina na čekanju — prikupiti uzorak kroz silikatni pijesak."}],zastave:["FIC (sumnja) — pratiti učestalost epizoda","Analiza urina — čeka se uzorak"],healthStatus:"alert",profilePhoto:"",photos:[],diet:{hrana:"",tip:"",raspored:"",porcija:"",favoriti:"",izbjegavati:""},cjepiva:[],lijekovi:[],paraziti:[],troskovi:[],vet:{ime:"",telefon:"",adresa:"",email:""},raspolozenje:[]},
+  {id:6,name:"Lino",emoji:"🧡",spol:"Mužjak",sterilizirana:false,rodjendan:"Nepoznat (proc. rujan/listopad 2024.)",gotchaDay:"18. prosinca 2025.",lokacija:"Glavna kuća",boja:"Đinđer i bijela, meki narančasti tabby uzorci",oci:"Toplo jantarne",tezina:null,hijerarhija:6,hijerarhijaLabel:"Poremećujući — smirit će se nakon kastracije",licnost:"Divlje dijete, pun hormonalne energije. Nije se boji nikoga. Jede kao usisavač — krade hranu svima.",odnosi:"Sukobljava se sa svima zbog hormona. Kastracija planirana uskoro.",porijeklo:"Spašen s ulice. Jedva preživio panleukopenigu. Sada cvjeta.",medical:[{id:"m11",datum:"",kategorija:"Zdravlje",biljeska:"Panleukopenija — zaražen kao lutajući mačić. Jedva preživio. Potpuni oporavak."},{id:"m12",datum:"Trajno",kategorija:"Lijek",biljeska:"Imunostimulatori — tablete za jačanje imuniteta nakon panleukopenije."},{id:"m13",datum:"U tijeku",kategorija:"Veterinar",biljeska:"Kastracija planirana u sljedeća 2–3 tjedna."}],zastave:["Nije kastriran — kastracija planirana","Imunosupresan — pratiti dugoročno","Krade hranu — obroke davati odvojeno"],healthStatus:"alert",profilePhoto:"",photos:[],diet:{hrana:"",tip:"",raspored:"",porcija:"",favoriti:"",izbjegavati:""},cjepiva:[],lijekovi:[],paraziti:[],troskovi:[],vet:{ime:"",telefon:"",adresa:"",email:""},raspolozenje:[]},
+  {id:7,name:"Maćka",emoji:"🌿",spol:"Ženka",sterilizirana:true,rodjendan:"Nepoznat",gotchaDay:"23. lipnja (dijeli s Mišom)",lokacija:"Ljetna",boja:"Smeđi tabby, masne pruge — nalikuje Mišu",oci:"Zelene",tezina:3.5,hijerarhija:1,hijerarhijaLabel:"Dominantna u Ljetnoj",licnost:"Plašljiva ali ogromni ljubimac ispod svega. Slini kad prrede 🤤. Mirna i jaka — sve je preživjela.",odnosi:"Dominira nad Maćakom. Mišina biološka sestra.",porijeklo:"",medical:[{id:"m14",datum:"Višekratno",kategorija:"Zdravlje",biljeska:"Ponavljajuće epizode temperature — iznenadni gubitak apetita i letargija, 2–3 dana terapije."},{id:"m15",datum:"",kategorija:"Zdravlje",biljeska:"Trovanje organofosforom — teže nego kod Pere. Pronađena pri kraju, spašena u zadnji čas. B kompleks. Morala iznova učiti hodati 7 dana."},{id:"m16",datum:"Ožujak 2026.",kategorija:"Zdravlje",biljeska:"Prolaps rektuma — uzrokovan parazitima, potaknut tabletom za dehelmintizaciju. Zbrinjeno."}],zastave:["Ponavljajuće temperature — istražiti temeljni uzrok","Nedavni prolaps (ožujak 2026.) — pratiti","Niska težina (3,5 kg) — pratiti apsorpciju"],healthStatus:"alert",profilePhoto:"",photos:[],diet:{hrana:"",tip:"",raspored:"",porcija:"",favoriti:"",izbjegavati:""},cjepiva:[],lijekovi:[],paraziti:[],troskovi:[],vet:{ime:"",telefon:"",adresa:"",email:""},raspolozenje:[]},
+  {id:8,name:"Maćak",emoji:"☀️",spol:"Mužjak",sterilizirana:false,rodjendan:"Nepoznat",gotchaDay:"Kolovoz 2025.",lokacija:"Ljetna",boja:"Bijelo-sivi tabby, meke zakrpljene oznake",oci:"Meko zeleno-žute",tezina:5.5,hijerarhija:2,hijerarhijaLabel:"Submisivan u Ljetnoj",licnost:"Iznimno tolerantan i easygoing. Sjedio mirno dok ga dijete nije puštalo — bez ogrebotine.",odnosi:"Submisivan — Maćka vodi. Došao tražeći kokoši, pronašao obitelj.",porijeklo:"Došao u kolovozu 2025. tražeći kokoši. Počeo se hraniti i ostao.",medical:[{id:"m17",datum:"Trajno",kategorija:"Zdravlje",biljeska:"Ponavljajući problem s parazitima — redovito čišćenje i praćenje."}],zastave:["Paraziti — redovito tretirati"],healthStatus:"watch",profilePhoto:"",photos:[],diet:{hrana:"",tip:"",raspored:"",porcija:"",favoriti:"",izbjegavati:""},cjepiva:[],lijekovi:[],paraziti:[],troskovi:[],vet:{ime:"",telefon:"",adresa:"",email:""},raspolozenje:[]}
+];
+
+const KATS = ["Zdravlje","Težina","Ponašanje","Veterinar","Lijek","Bilješka"];
+const SL = {good:"Dobro",watch:"Pratiti",alert:"Upozorenje"};
+const MONTHS = ["Siječanj","Veljača","Ožujak","Travanj","Svibanj","Lipanj","Srpanj","Kolovoz","Rujan","Listopad","Studeni","Prosinac"];
+const DAYS = ["Pon","Uto","Sri","Čet","Pet","Sub","Ned"];
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let state = {
+  cats: [],
+  logs: [],
+  weights: {},
+  events: [],
+  tab: "macke",
+  selected: null,
+  lightbox: null,
+  editingField: null,
+  editingMedId: null,
+  calYear: new Date().getFullYear(),
+  calMonth: new Date().getMonth(),
+  logFilter: "Sve",
+  showLogForm: false,
+  showWeightForm: false,
+  showEventForm: false,
+  showParForm: false,
+  showMoodForm: false,
+  showExpForm: false,
+  showVetForm: false,
+  showVetCatForm: false,
+  showEmCard: null,
+  showDietForm: false,
+  showVaxForm: false,
+  showMedForm: false,
+  showAppetiteForm: false,
+};
+
+function load() {
+  try { state.cats = JSON.parse(localStorage.getItem("mc_cats")) || deepCopy(CATS0); } catch { state.cats = deepCopy(CATS0); }
+  // Ensure all cats have new fields
+  state.cats.forEach(cat => {
+    if (!cat.diet) cat.diet = {hrana:"",tip:"",raspored:"",porcija:"",favoriti:"",izbjegavati:""};
+    if (!cat.cjepiva) cat.cjepiva = [];
+    if (!cat.lijekovi) cat.lijekovi = [];
+  });
+  try { state.logs = JSON.parse(localStorage.getItem("mc_logs")) || []; } catch { state.logs = []; }
+  try { state.weights = JSON.parse(localStorage.getItem("mc_weights")) || {}; } catch { state.weights = {}; }
+  try { state.events = JSON.parse(localStorage.getItem("mc_events")) || []; } catch { state.events = []; }
+  try { state.appetiteLogs = JSON.parse(localStorage.getItem("mc_appetite")) || []; } catch { state.appetiteLogs = []; }
+  try { state.globalVet = JSON.parse(localStorage.getItem("mc_vet")) || {ime:"",telefon:"",adresa:"",email:""}; } catch { state.globalVet = {ime:"",telefon:"",adresa:"",email:""}; }
+  try { state.troskovi = JSON.parse(localStorage.getItem("mc_troskovi")) || []; } catch { state.troskovi = []; }
+  // Ensure new fields on existing cats
+  state.cats.forEach(cat => {
+    if (!cat.paraziti) cat.paraziti = [];
+    if (!cat.troskovi) cat.troskovi = [];
+    if (!cat.vet) cat.vet = {ime:"",telefon:"",adresa:"",email:""};
+    if (!cat.raspolozenje) cat.raspolozenje = [];
+  });
+}
+function save() {
+  localStorage.setItem("mc_cats", JSON.stringify(state.cats));
+  localStorage.setItem("mc_logs", JSON.stringify(state.logs));
+  localStorage.setItem("mc_weights", JSON.stringify(state.weights));
+  localStorage.setItem("mc_events", JSON.stringify(state.events));
+  localStorage.setItem("mc_appetite", JSON.stringify(state.appetiteLogs||[]));
+  localStorage.setItem("mc_vet", JSON.stringify(state.globalVet||{}));
+  localStorage.setItem("mc_troskovi", JSON.stringify(state.troskovi||[]));
+}
+function deepCopy(x) { return JSON.parse(JSON.stringify(x)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function today() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function todayStr() { return today(); }
+
+function updateCat(id, patch) {
+  state.cats = state.cats.map(c => c.id === id ? {...c, ...patch} : c);
+  if (state.selected && state.selected.id === id) state.selected = state.cats.find(c => c.id === id);
+  save();
+  render();
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function render() {
+  renderNav();
+  renderMain();
+}
+
+function renderNav() {
+  const tabs = [
+    {id:"macke",label:"🐱 Mačke"},
+    {id:"pregled",label:"📋 Pregled"},
+    {id:"dnevnik",label:"📖 Dnevnik"},
+    {id:"kalendar",label:"📅 Kalendar"},
+    {id:"hijerarhija",label:"👑 Hijerarhija"},
+    {id:"rodjendan",label:"🎂 Datumi"},
+    {id:"budzet",label:"💰 Budžet"},
+  ];
+  document.getElementById("nav").innerHTML = tabs.map(t =>
+    `<button class="nb${state.tab===t.id?" active":""}" onclick="setTab('${t.id}')">${t.label}</button>`
+  ).join("");
+}
+
+function setTab(t) {
+  state.tab = t;
+  state.selected = null;
+  state.editingField = null;
+  state.editingMedId = null;
+  state.showLogForm = false;
+  state.showWeightForm = false;
+  state.showEventForm = false;
+  render();
+}
+
+function renderMain() {
+  const m = document.getElementById("main");
+  if (state.tab === "macke") {
+    if (state.selected) m.innerHTML = renderProfile();
+    else m.innerHTML = renderCatList();
+  } else if (state.tab === "pregled") m.innerHTML = renderOverview();
+  else if (state.tab === "dnevnik") m.innerHTML = renderDnevnik();
+  else if (state.tab === "kalendar") m.innerHTML = renderKalendar();
+  else if (state.tab === "hijerarhija") m.innerHTML = renderHijerarhija();
+  else if (state.tab === "rodjendan") m.innerHTML = renderBirthdayTab();
+  else if (state.tab === "budzet") m.innerHTML = renderBudzet();
+  attachPhotoListeners();
+}
+
+// ── CAT LIST ──────────────────────────────────────────────────────────────
+function renderCatList() {
+  const house = state.cats.filter(c => c.lokacija === "Glavna kuća");
+  const ljetna = state.cats.filter(c => c.lokacija === "Ljetna");
+  return `
+    <div class="loc-label">🏠 Glavna kuća</div>
+    <div class="cat-grid">${house.map(catCard).join("")}</div>
+    <div class="loc-label">🌿 Ljetna</div>
+    <div class="cat-grid">${ljetna.map(catCard).join("")}</div>
+  `;
+}
+
+function catCard(c) {
+  const w = state.weights[c.id];
+  const latest = w && w.length ? w[w.length-1].value : c.tezina;
+  const dc = {good:"dg",watch:"dw",alert:"da"}[c.healthStatus];
+  const photo = c.profilePhoto ? `<img src="${c.profilePhoto}" alt="">` : `<span>${c.emoji}</span>`;
+  return `
+    <div class="cat-card" data-catid="${c.id}" onclick="selectCat(${c.id})">
+      <div class="cc-photo">${photo}<div class="hdot ${dc}"></div></div>
+      <div class="cc-body">
+        <div class="cc-name">${c.emoji} ${c.name}</div>
+        <div class="cc-meta">${c.lokacija} · ${c.spol}</div>
+        ${latest ? `<div class="cc-w">⚖️ ${latest} kg</div>` : ""}
+      </div>
+    </div>`;
+}
+
+function selectCat(id) {
+  state.selected = state.cats.find(c => c.id === id);
+  state.editingField = null;
+  state.editingMedId = null;
+  state.showLogForm = false;
+  state.showWeightForm = false;
+  render();
+}
+
+// ── PROFILE ───────────────────────────────────────────────────────────────
+function renderProfile() {
+  const c = state.selected;
+  const catWeights = state.weights[c.id] || [];
+  const catLogs = state.logs.filter(l => l.catId === c.id);
+  const latestW = catWeights.length ? catWeights[catWeights.length-1].value : c.tezina;
+  const steril = c.sterilizirana ? (c.spol==="Ženka"?"Sterilizirana":"Kastriran") : (c.spol==="Ženka"?"Nije sterilizirana":"Nije kastriran");
+  const pfp = c.profilePhoto ? `<img src="${c.profilePhoto}" alt="">` : `<span>${c.emoji}</span>`;
+  const allMed = [...c.medical, ...catLogs.map(l => ({...l, isLog:true}))];
+
+  return `
+    <button class="back-btn" onclick="goBack()">← Natrag na sve mačke</button>
+    <div class="ph">
+      <div class="pfp-wrap">
+        <div class="pfp-img" id="pfp-preview-${c.id}">${pfp}</div>
+        <label class="pfp-label" title="Promijeni profilnu sliku">
+          📷<input type="file" accept="image/*" data-action="pfp" data-catid="${c.id}">
+        </label>
+      </div>
+      <div style="flex:1">
+        <div class="ph-title">${c.name}</div>
+        <div class="ph-sub">${c.lokacija} · ${c.hijerarhijaLabel}</div>
+        <div class="tags">
+          <span class="tag">${c.spol}</span>
+          <span class="tag">${steril}</span>
+          ${latestW ? `<span class="tag">⚖️ ${latestW} kg</span>` : ""}
+          <span class="tag">${SL[c.healthStatus]}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHOTOS -->
+    <div class="sc">
+      <div class="st"><span>📸 Fotografije</span></div>
+      <div class="gallery" id="gallery-${c.id}">
+        ${(c.photos||[]).map((p,i) => `
+          <div class="gthumb" onclick="openLightbox('${p}')">
+            <img src="${p}" alt="">
+            <button class="gdel" onclick="event.stopPropagation();deletePhoto(${c.id},${i})">✕</button>
+          </div>`).join("")}
+        ${(c.photos||[]).length < 10 ? `
+          <label class="gadd-label">
+            +<input type="file" accept="image/*" multiple data-action="gallery" data-catid="${c.id}">
+          </label>` : ""}
+      </div>
+    </div>
+
+    <!-- BASIC INFO -->
+    <div class="sc">
+      <div class="st"><span>📋 Osnovni podaci</span></div>
+      <div class="ig">
+        ${editableField(c, "rodjendan", "Rođendan")}
+        ${editableField(c, "gotchaDay", "Gotcha Dan 🎉")}
+        ${editableField(c, "boja", "Boja dlake")}
+        ${editableField(c, "oci", "Oči")}
+      </div>
+    </div>
+
+    <!-- PERSONALITY -->
+    <div class="sc">
+      <div class="st"><span>💬 Karakter i odnosi</span></div>
+      <div style="margin-bottom:.65rem">
+        <div class="il">Karakter</div>
+        ${editableTextarea(c, "licnost")}
+      </div>
+      <div style="margin-bottom:.65rem">
+        <div class="il">Odnosi</div>
+        ${editableTextarea(c, "odnosi")}
+      </div>
+      <div>
+        <div class="il">Porijeklo / priča</div>
+        ${editableTextarea(c, "porijeklo")}
+      </div>
+    </div>
+
+    <!-- FLAGS -->
+    <div class="sc">
+      <div class="st"><span>⚠️ Aktivna upozorenja</span><button class="be" onclick="addFlag(${c.id})">+ Dodaj</button></div>
+      ${c.zastave.length === 0 ? '<div class="empty">Nema aktivnih upozorenja.</div>' : ""}
+      ${c.zastave.map((f,i) => `
+        <div class="fi">
+          <span style="flex:1">⚠️ ${f}</span>
+          <button class="bd" onclick="deleteFlag(${c.id},${i})">✕</button>
+        </div>`).join("")}
+    </div>
+
+    <!-- WEIGHT -->
+    <div class="sc">
+      <div class="st"><span>⚖️ Praćenje težine</span></div>
+      ${catWeights.length >= 2 ? `<canvas id="wchart-${c.id}" width="600" height="80"></canvas>` : ""}
+      <div>
+        ${catWeights.length === 0 && c.tezina ? `<div class="wr"><span style="font-style:italic;color:var(--rust)">Početna težina (procjena)</span><span class="wv">${c.tezina} kg</span></div>` : ""}
+        ${catWeights.map((w,i) => `
+          <div class="wr">
+            <span style="color:var(--rust);font-size:.74rem">${w.datum}</span>
+            <span class="wv">${w.value} kg</span>
+            <button class="bd" onclick="deleteWeight(${c.id},'${w.id}')">✕</button>
+          </div>`).join("")}
+      </div>
+      ${state.showWeightForm ? `
+        <div class="lf">
+          <div class="fr">
+            <input type="date" id="wdate" value="${today()}">
+            <input type="number" step="0.1" placeholder="Težina (kg)" id="wval">
+          </div>
+          <div style="display:flex;gap:.4rem">
+            <button class="btn bp" onclick="submitWeight(${c.id})">Spremi</button>
+            <button class="btn bs" onclick="toggleForm('weight')">Odustani</button>
+          </div>
+        </div>` :
+        `<button class="btn bs" style="margin-top:.7rem;font-size:.75rem" onclick="toggleForm('weight')">+ Dodaj mjerenje</button>`
+      }
+    </div>
+
+    <!-- MEDICAL -->
+    <div class="sc">
+      <div class="st"><span>🏥 Zdravstvena povijest</span></div>
+      ${allMed.length === 0 ? '<div class="empty">Nema zabilježenih podataka.</div>' : ""}
+      ${allMed.map(m => renderMedEntry(m, c.id)).join("")}
+      ${state.showLogForm ? `
+        <div class="lf" style="margin-top:.7rem">
+          <div class="fr">
+            <select id="lkat">${KATS.map(k=>`<option>${k}</option>`).join("")}</select>
+            <input type="date" id="ldat" value="${today()}">
+          </div>
+          <textarea id="lbil" placeholder="Opis / bilješka..."></textarea>
+          <div style="display:flex;gap:.4rem">
+            <button class="btn bp" onclick="submitLog(${c.id})">Spremi</button>
+            <button class="btn bs" onclick="toggleForm('log')">Odustani</button>
+          </div>
+        </div>` :
+        `<button class="btn bs" style="margin-top:.7rem;font-size:.75rem" onclick="toggleForm('log')">+ Dodaj zapis</button>`
+      }
+    </div>
+
+    <!-- DIET -->
+    <div class="sc">
+      <div class="st"><span>🍽️ Prehrana</span></div>
+      <div class="diet-grid">
+        <div><div class="il">Hrana (marka/naziv)</div>${editableField(c, "diet.hrana", "")}</div>
+        <div><div class="il">Tip (suha/mokra/mješano)</div>${editableField(c, "diet.tip", "")}</div>
+        <div><div class="il">Raspored hranjenja</div>${editableField(c, "diet.raspored", "")}</div>
+        <div><div class="il">Porcija</div>${editableField(c, "diet.porcija", "")}</div>
+      </div>
+      <div style="margin-bottom:.6rem"><div class="il">Favoriti i poslastice</div>${editableTextarea(c, "diet.favoriti")}</div>
+      <div><div class="il">Izbjegavati / netolerancije</div>${editableTextarea(c, "diet.izbjegavati")}</div>
+      <div style="margin-top:.8rem;border-top:1px solid var(--parchment);padding-top:.7rem">
+        <div class="st" style="margin-bottom:.5rem;border:none;padding:0"><span style="font-size:.85rem">📊 Dnevnik apetita</span><button class="be" onclick="toggleForm('appetite')">+ Dodaj</button></div>
+        ${(state.appetiteLogs||[]).filter(a=>a.catId===c.id).slice(-7).reverse().map(a => `
+          <div class="appetite-row">
+            <span style="color:var(--rust);font-size:.74rem">${a.datum}</span>
+            <span>${["😿","🙁","😐","😊","😋"][a.ocjena-1]} ${"★".repeat(a.ocjena)}${"☆".repeat(5-a.ocjena)}</span>
+            ${a.biljeska ? `<span style="font-style:italic;font-size:.76rem;color:var(--ink)">${a.biljeska}</span>` : ""}
+          </div>`).join("")}
+        ${!(state.appetiteLogs||[]).filter(a=>a.catId===c.id).length ? '<div class="empty" style="padding:.8rem">Još nema zapisa apetita.</div>' : ""}
+        ${state.showAppetiteForm ? `
+          <div class="lf">
+            <div class="fr">
+              <input type="date" id="apdat" value="${today()}">
+              <select id="apocj">
+                <option value="1">1 — Nije jeo/la</option>
+                <option value="2">2 — Malo jeo/la</option>
+                <option value="3" selected>3 — Normalno</option>
+                <option value="4">4 — Dobro jeo/la</option>
+                <option value="5">5 — Odlično</option>
+              </select>
+            </div>
+            <input type="text" id="apbil" placeholder="Bilješka (neobavezno)">
+            <div style="display:flex;gap:.4rem">
+              <button class="btn bp" onclick="submitAppetite(${c.id})">Spremi</button>
+              <button class="btn bs" onclick="toggleForm('appetite')">Odustani</button>
+            </div>
+          </div>` : ""}
+      </div>
+    </div>
+
+    <!-- VACCINES -->
+    <div class="sc">
+      <div class="st"><span>💉 Cjepiva</span><button class="be" onclick="toggleForm('vax')">+ Dodaj</button></div>
+      ${(c.cjepiva||[]).length === 0 ? '<div class="empty">Nema zabilježenih cjepiva.</div>' : ""}
+      ${(c.cjepiva||[]).map((v,i) => {
+        const due = v.sljedeci ? new Date(v.sljedeci) : null;
+        const now = new Date();
+        const diff = due ? Math.round((due-now)/(1000*60*60*24)) : null;
+        const dueClass = diff === null ? "" : diff < 0 ? "vax-overdue" : diff < 30 ? "vax-soon" : "vax-ok";
+        const dueLabel = diff === null ? "" : diff < 0 ? `Zakasnilo ${Math.abs(diff)} dana!` : diff === 0 ? "Danas!" : `Za ${diff} dana`;
+        return `<div class="vax-row">
+          <span class="vax-name">${v.naziv}</span>
+          <span class="vax-date">${v.datum ? "Dano: "+v.datum : "Datum nepoznat"}</span>
+          ${v.sljedeci ? `<span class="vax-due ${dueClass}">${dueLabel}</span>` : ""}
+          <button class="bd" onclick="deleteVax(${c.id},${i})">✕</button>
+        </div>`;
+      }).join("")}
+      ${state.showVaxForm ? `
+        <div class="lf">
+          <input type="text" id="vaxnaziv" placeholder="Naziv cjepiva (npr. Trokompleksno)">
+          <div class="fr">
+            <input type="date" id="vaxdat" placeholder="Datum davanja">
+            <input type="date" id="vaxslj" placeholder="Sljedeće davanje">
+          </div>
+          <div style="display:flex;gap:.4rem">
+            <button class="btn bp" onclick="submitVax(${c.id})">Spremi</button>
+            <button class="btn bs" onclick="toggleForm('vax')">Odustani</button>
+          </div>
+        </div>` : ""}
+    </div>
+
+    <!-- ACTIVE MEDS -->
+    <div class="sc">
+      <div class="st"><span>💊 Aktivni lijekovi</span><button class="be" onclick="toggleForm('med')">+ Dodaj</button></div>
+      ${(c.lijekovi||[]).length === 0 ? '<div class="empty">Nema aktivnih lijekova.</div>' : ""}
+      ${(c.lijekovi||[]).map((m,i) => `
+        <div class="med-active-row">
+          <div style="flex:1">
+            <div class="med-name">💊 ${m.naziv}</div>
+            ${m.doza ? `<div style="font-size:.76rem;color:var(--rust)">Doza: ${m.doza}</div>` : ""}
+            ${m.od ? `<div style="font-size:.74rem;font-style:italic;color:var(--ink)">Od: ${m.od}${m.do ? " → Do: "+m.do : ""}</div>` : ""}
+            ${m.biljeska ? `<div style="font-size:.76rem;margin-top:.15rem">${m.biljeska}</div>` : ""}
+          </div>
+          <button class="bd" onclick="deleteMedActive(${c.id},${i})">✕</button>
+        </div>`).join("")}
+      ${state.showMedForm ? `
+        <div class="lf">
+          <input type="text" id="mednaziv" placeholder="Naziv lijeka">
+          <input type="text" id="meddoza" placeholder="Doza (npr. 1/2 tablete dnevno)">
+          <div class="fr">
+            <input type="date" id="medod" placeholder="Od datuma">
+            <input type="date" id="meddo" placeholder="Do datuma (neob.)">
+          </div>
+          <input type="text" id="medbil" placeholder="Bilješka (neobavezno)">
+          <div style="display:flex;gap:.4rem">
+            <button class="btn bp" onclick="submitMedActive(${c.id})">Spremi</button>
+            <button class="btn bs" onclick="toggleForm('med')">Odustani</button>
+          </div>
+        </div>` : ""}
+    </div>
+
+    <!-- PARASITES -->
+    <div class="sc">
+      <div class="st"><span>🦠 Paraziti</span><button class="be" onclick="toggleForm('par')">+ Dodaj</button></div>
+      ${(c.paraziti||[]).length === 0 ? '<div class="empty">Nema zabilježenih tretmana.</div>' : ""}
+      ${(c.paraziti||[]).map((p,i) => {
+        const due = p.sljedeci ? new Date(p.sljedeci) : null;
+        const now = new Date();
+        const diff = due ? Math.round((due-now)/(1000*60*60*24)) : null;
+        const dueClass = diff===null?"" : diff<0?"vax-overdue":diff<14?"vax-soon":"vax-ok";
+        const dueLabel = diff===null?"" : diff<0?`Zakasnilo ${Math.abs(diff)}d!`:diff===0?"Danas!":`Za ${diff}d`;
+        return `<div class="par-row">
+          <span class="par-name">${p.proizvod}</span>
+          <span style="color:var(--rust);font-size:.74rem;font-style:italic">${p.datum||""}</span>
+          <span style="font-size:.74rem;color:var(--ink);flex:1">${p.tip||""}</span>
+          ${p.sljedeci?`<span class="par-due ${dueClass}">${dueLabel}</span>`:""}
+          <button class="bd" onclick="deletePar(${c.id},${i})">✕</button>
+        </div>`;
+      }).join("")}
+      ${state.showParForm ? `
+        <div class="lf">
+          <input type="text" id="parpro" placeholder="Proizvod (npr. Frontline, Drontal)">
+          <select id="partype">
+            <option value="">— Vrsta —</option>
+            <option>Buhe i krpelji</option>
+            <option>Crijevni paraziti</option>
+            <option>Kombinacija</option>
+            <option>Ostalo</option>
+          </select>
+          <div class="fr">
+            <input type="date" id="pardat">
+            <input type="date" id="parslj" placeholder="Sljedeći tretman">
+          </div>
+          <div style="display:flex;gap:.4rem">
+            <button class="btn bp" onclick="submitPar(${c.id})">Spremi</button>
+            <button class="btn bs" onclick="toggleForm('par')">Odustani</button>
+          </div>
+        </div>` : ""}
+    </div>
+
+    <!-- VET -->
+    <div class="sc">
+      <div class="st"><span>🏥 Veterinar</span></div>
+      ${renderVetCard(c)}
+    </div>
+
+    <!-- EXPENSES PER CAT -->
+    <div class="sc">
+      <div class="st"><span>💸 Troškovi</span><button class="be" onclick="toggleForm('exp')">+ Dodaj</button></div>
+      ${(c.troskovi||[]).length === 0 ? '<div class="empty">Nema zabilježenih troškova.</div>' : ""}
+      ${[...(c.troskovi||[])].reverse().slice(0,10).map((t,i) => `
+        <div class="exp-row">
+          <span style="color:var(--rust);font-size:.72rem;min-width:82px">${t.datum}</span>
+          <span class="exp-cat">${t.kategorija}</span>
+          <span style="flex:1;font-size:.8rem">${t.opis}</span>
+          <span class="exp-amt">${t.iznos} €</span>
+          <button class="bd" onclick="deleteExp(${c.id},'${t.id}')">✕</button>
+        </div>`).join("")}
+      ${(c.troskovi||[]).length > 0 ? `
+        <div class="exp-total">Ukupno: ${(c.troskovi||[]).reduce((s,t)=>s+parseFloat(t.iznos||0),0).toFixed(2)} €</div>` : ""}
+      ${state.showExpForm ? `
+        <div class="lf">
+          <div class="fr">
+            <input type="date" id="expdat" value="${today()}">
+            <select id="expkat">
+              <option>Veterinar</option>
+              <option>Hrana</option>
+              <option>Lijekovi</option>
+              <option>Cjepivo</option>
+              <option>Oprema</option>
+              <option>Ostalo</option>
+            </select>
+          </div>
+          <input type="text" id="expopis" placeholder="Opis (npr. Pregled, Frontline...)">
+          <input type="number" step="0.01" id="expizn" placeholder="Iznos (€)">
+          <div style="display:flex;gap:.4rem">
+            <button class="btn bp" onclick="submitExp(${c.id})">Spremi</button>
+            <button class="btn bs" onclick="toggleForm('exp')">Odustani</button>
+          </div>
+        </div>` : ""}
+    </div>
+
+    <!-- EMERGENCY CARD -->
+    <div class="sc">
+      <div class="st"><span>🆘 Hitna kartica</span>
+        <button class="be" onclick="printEmergencyCard(${c.id})">🖨️ Ispiši</button>
+      </div>
+      ${renderEmergencyCard(c)}
+    </div>
+  `;
+}
+
+function renderMedEntry(m, catId) {
+  if (state.editingMedId === m.id && !m.isLog) {
+    return `
+      <div class="le">
+        <div class="fr" style="margin-bottom:.4rem">
+          <select class="ei" id="ekat" onchange="">${KATS.map(k=>`<option${m.kategorija===k?" selected":""}>${k}</option>`).join("")}</select>
+          <input class="ei" id="edat" value="${m.datum||""}" placeholder="Datum">
+        </div>
+        <textarea class="eta" id="ebil">${m.biljeska}</textarea>
+        <div class="erow">
+          <button class="btn bp" style="font-size:.74rem;padding:.3rem .7rem" onclick="saveMedEdit(${catId},'${m.id}')">Spremi</button>
+          <button class="btn bs" style="font-size:.74rem;padding:.3rem .7rem" onclick="cancelMedEdit()">Odustani</button>
+        </div>
+      </div>`;
+  }
+  return `
+    <div class="le">
+      <div class="lm">
+        ${m.datum ? `<span class="ld">${m.datum}</span>` : ""}
+        <span class="lcat c${m.kategorija}">${m.kategorija}</span>
+        <div style="margin-left:auto;display:flex;gap:.3rem">
+          ${!m.isLog ? `<button class="be" onclick="startMedEdit('${m.id}')">✏️</button>` : ""}
+          <button class="bd" onclick="${m.isLog ? `deleteLog('${m.id}')` : `deleteMed(${catId},'${m.id}')`}">✕</button>
+        </div>
+      </div>
+      <div>${m.biljeska}</div>
+    </div>`;
+}
+
+function getNestedVal(obj, path) {
+  return path.split('.').reduce((o,k) => (o&&o[k]!==undefined?o[k]:""), obj);
+}
+function setNestedVal(obj, path, val) {
+  const keys = path.split('.');
+  let o = obj;
+  for (let i=0;i<keys.length-1;i++) { if(!o[keys[i]])o[keys[i]]={};o=o[keys[i]]; }
+  o[keys[keys.length-1]] = val;
+}
+
+function editableField(c, field, label) {
+  const val = getNestedVal(c, field);
+  const safeId = field.replace('.','__');
+  if (state.editingField === field) {
+    return `<div>
+      ${label ? `<div class="il">${label}</div>` : ""}
+      <input class="ei" id="ef-${safeId}" value="${(val||"").replace(/"/g,'&quot;')}">
+      <div class="erow">
+        <button class="btn bp" style="font-size:.74rem;padding:.28rem .65rem" onclick="saveField(${c.id},'${field}')">Spremi</button>
+        <button class="btn bs" style="font-size:.74rem;padding:.28rem .65rem" onclick="cancelEdit()">Odustani</button>
+      </div>
+    </div>`;
+  }
+  return `<div>
+    ${label ? `<div class="il">${label}</div>` : ""}
+    <div class="iv editable" onclick="startEdit('${field}')"><span>${val||"—"}</span></div>
+  </div>`;
+}
+
+function editableTextarea(c, field) {
+  const val = getNestedVal(c, field);
+  const safeId = field.replace('.','__');
+  if (state.editingField === field) {
+    return `<div>
+      <textarea class="eta" id="ef-${safeId}">${val||""}</textarea>
+      <div class="erow">
+        <button class="btn bp" style="font-size:.74rem;padding:.28rem .65rem" onclick="saveField(${c.id},'${field}')">Spremi</button>
+        <button class="btn bs" style="font-size:.74rem;padding:.28rem .65rem" onclick="cancelEdit()">Odustani</button>
+      </div>
+    </div>`;
+  }
+  return `<div class="editable" onclick="startEdit('${field}')" style="font-size:.83rem;line-height:1.6;cursor:pointer">
+    <span style="flex:1">${val||'<em style="color:var(--rust)">Klikni za uređivanje</em>'}</span>
+  </div>`;
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────
+function goBack() { state.selected=null; state.editingField=null; state.editingMedId=null; state.showLogForm=false; state.showWeightForm=false; render(); }
+function startEdit(f) { state.editingField=f; render(); setTimeout(()=>{ const el=document.getElementById("ef-"+f); if(el){el.focus();if(el.select)el.select();}},50); }
+function cancelEdit() { state.editingField=null; render(); }
+function saveField(id, field) {
+  const safeId = field.replace('.','__');
+  const el = document.getElementById("ef-"+safeId);
+  if (!el) return;
+  const cat = state.cats.find(c=>c.id===id);
+  if (!cat) return;
+  setNestedVal(cat, field, el.value);
+  if (state.selected && state.selected.id===id) setNestedVal(state.selected, field, el.value);
+  state.editingField = null;
+  save(); render();
+}
+function startMedEdit(id) { state.editingMedId=id; render(); }
+function cancelMedEdit() { state.editingMedId=null; render(); }
+function saveMedEdit(catId, medId) {
+  const kat = document.getElementById("ekat").value;
+  const dat = document.getElementById("edat").value;
+  const bil = document.getElementById("ebil").value;
+  const c = state.cats.find(c=>c.id===catId);
+  const medical = c.medical.map(m => m.id===medId ? {...m,kategorija:kat,datum:dat,biljeska:bil} : m);
+  updateCat(catId, {medical});
+  state.editingMedId = null;
+}
+function deleteMed(catId, medId) {
+  const c = state.cats.find(c=>c.id===catId);
+  updateCat(catId, {medical: c.medical.filter(m=>m.id!==medId)});
+}
+function deleteLog(logId) {
+  state.logs = state.logs.filter(l=>l.id!==logId);
+  save(); render();
+}
+function addFlag(catId) {
+  const f = prompt("Novo upozorenje:");
+  if (!f) return;
+  const c = state.cats.find(c=>c.id===catId);
+  updateCat(catId, {zastave:[...c.zastave, f]});
+}
+function deleteFlag(catId, i) {
+  const c = state.cats.find(c=>c.id===catId);
+  updateCat(catId, {zastave: c.zastave.filter((_,j)=>j!==i)});
+}
+function toggleForm(type) {
+  if (type==="log") state.showLogForm = !state.showLogForm;
+  if (type==="weight") state.showWeightForm = !state.showWeightForm;
+  if (type==="event") state.showEventForm = !state.showEventForm;
+  if (type==="appetite") state.showAppetiteForm = !state.showAppetiteForm;
+  if (type==="vax") state.showVaxForm = !state.showVaxForm;
+  if (type==="med") state.showMedForm = !state.showMedForm;
+  if (type==="par") state.showParForm = !state.showParForm;
+  if (type==="exp") state.showExpForm = !state.showExpForm;
+  if (type==="vet") { state.showVetForm = !state.showVetForm; state.showVetCatForm=false; }
+  if (type==="vetcat") { state.showVetCatForm = !state.showVetCatForm; state.showVetForm=false; }
+  if (type==="mood") state.showMoodForm = !state.showMoodForm;
+  render();
+}
+function submitLog(catId) {
+  const bil = document.getElementById("lbil").value.trim();
+  if (!bil) return;
+  state.logs.push({id:uid(),catId,kategorija:document.getElementById("lkat").value,datum:document.getElementById("ldat").value,biljeska:bil});
+  state.showLogForm = false;
+  save(); render();
+}
+function submitWeight(catId) {
+  const val = parseFloat(document.getElementById("wval").value);
+  const dat = document.getElementById("wdate").value;
+  if (!val) return;
+  if (!state.weights[catId]) state.weights[catId]=[];
+  state.weights[catId].push({id:uid(),datum:dat,value:val});
+  state.showWeightForm = false;
+  save(); render();
+}
+function deleteWeight(catId, wid) {
+  state.weights[catId] = (state.weights[catId]||[]).filter(w=>w.id!==wid);
+  save(); render();
+}
+function deletePhoto(catId, i) {
+  const c = state.cats.find(c=>c.id===catId);
+  const photos = (c.photos||[]).filter((_,j)=>j!==i);
+  updateCat(catId, {photos});
+}
+function openLightbox(src) {
+  document.getElementById("lightbox-img").src = src;
+  document.getElementById("lightbox").classList.remove("hidden");
+}
+function closeLightbox() { document.getElementById("lightbox").classList.add("hidden"); }
+
+// ── PHOTO LISTENERS ───────────────────────────────────────────────────────
+function compressImage(file, maxPx, quality, callback) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement("canvas");
+      let w = img.width, h = img.height;
+      if (w > maxPx || h > maxPx) {
+        if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; }
+        else { w = Math.round(w * maxPx / h); h = maxPx; }
+      }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL("image/jpeg", quality));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function attachPhotoListeners() {
+  // Profile photo
+  document.querySelectorAll("input[data-action='pfp']").forEach(function(input) {
+    input.addEventListener("change", function() {
+      const catId = parseInt(this.dataset.catid);
+      const file = this.files[0];
+      if (!file) return;
+      compressImage(file, 800, 0.82, function(dataUrl) {
+        const cat = state.cats.find(c => c.id === catId);
+        if (!cat) return;
+        cat.profilePhoto = dataUrl;
+        if (state.selected && state.selected.id === catId) state.selected = cat;
+        save();
+        const preview = document.getElementById("pfp-preview-" + catId);
+        if (preview) preview.innerHTML = '<img src="' + dataUrl + '" alt="">';
+        const cardPhoto = document.querySelector(".cat-card[data-catid='" + catId + "'] .cc-photo");
+        if (cardPhoto) cardPhoto.innerHTML = '<img src="' + dataUrl + '" alt=""><div class="hdot ' + {good:"dg",watch:"dw",alert:"da"}[cat.healthStatus] + '"></div>';
+      });
+    });
+  });
+
+  // Gallery photos
+  document.querySelectorAll("input[data-action='gallery']").forEach(function(input) {
+    input.addEventListener("change", function() {
+      const catId = parseInt(this.dataset.catid);
+      const files = Array.from(this.files);
+      if (!files.length) return;
+      const gallery = document.getElementById("gallery-" + catId);
+      var pending = files.length;
+      var results = [];
+      files.forEach(function(file, idx) {
+        compressImage(file, 800, 0.82, function(dataUrl) {
+          results[idx] = dataUrl;
+          pending--;
+          if (pending === 0) {
+            const cat = state.cats.find(c => c.id === catId);
+            if (!cat) return;
+            cat.photos = [...(cat.photos || []), ...results].slice(0, 10);
+            if (state.selected && state.selected.id === catId) state.selected = cat;
+            save();
+            if (gallery) {
+              var thumbsHtml = "";
+              cat.photos.forEach(function(p, i) {
+                thumbsHtml += "<div class=\"gthumb\" onclick=\"openLightbox(this.querySelector('img').src)\">";
+                thumbsHtml += "<img src=\"" + p + "\" alt=\"\"/>";
+                thumbsHtml += "<button class=\"gdel\" onclick=\"event.stopPropagation();deletePhoto(" + catId + "," + i + ")\">✕</button>";
+                thumbsHtml += "</div>";
+              });
+              if (cat.photos.length < 10) {
+                thumbsHtml += "<label class=\"gadd-label\">+<input type=\"file\" accept=\"image/*\" multiple data-action=\"gallery\" data-catid=\"" + catId + "\"></label>";
+              }
+              gallery.innerHTML = thumbsHtml;
+              attachPhotoListeners();
+            }
+          }
+        });
+      });
+    });
+  });
+
+  // Draw weight chart after render
+  document.querySelectorAll("canvas[id^='wchart-']").forEach(canvas => {
+    const catId = parseInt(canvas.id.replace("wchart-",""));
+    drawWeightChart(canvas, catId);
+  });
+  // Draw growth charts
+  document.querySelectorAll("canvas[id^='gchart-']").forEach(canvas => {
+    const catId = parseInt(canvas.id.replace("gchart-",""));
+    drawGrowthChart(canvas, catId);
+  });
+}
+
+function drawWeightChart(canvas, catId) {
+  const entries = state.weights[catId] || [];
+  if (entries.length < 2) return;
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const vals = entries.map(e=>e.value);
+  const mn = Math.min(...vals)-0.3, mx = Math.max(...vals)+0.3;
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle = "#c0714f";
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  entries.forEach((e,i) => {
+    const x = (i/(entries.length-1))*W;
+    const y = H - ((e.value-mn)/(mx-mn))*H;
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  entries.forEach((e,i) => {
+    const x = (i/(entries.length-1))*W;
+    const y = H - ((e.value-mn)/(mx-mn))*H;
+    ctx.beginPath();
+    ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle="#c0714f";
+    ctx.fill();
+  });
+}
+
+// ── OVERVIEW ──────────────────────────────────────────────────────────────
+function renderOverview() {
+  const cats = state.cats;
+  const flags = cats.flatMap(c=>c.zastave.map(f=>({cat:c.name,flag:f})));
+  const recent = [...state.logs].reverse().slice(0,5);
+  return `
+    <div class="ov-grid">
+      <div class="stat"><div class="sn">8</div><div class="sl">Ukupno mačaka</div></div>
+      <div class="stat"><div class="sn" style="color:var(--green)">${cats.filter(c=>c.healthStatus==="good").length}</div><div class="sl">Dobro zdravlje</div></div>
+      <div class="stat"><div class="sn" style="color:var(--yellow)">${cats.filter(c=>c.healthStatus==="watch").length}</div><div class="sl">Pratiti</div></div>
+      <div class="stat"><div class="sn" style="color:var(--red)">${cats.filter(c=>c.healthStatus==="alert").length}</div><div class="sl">Upozorenja</div></div>
+    </div>
+    <div class="sc">
+      <div class="st"><span>⚠️ Sva aktivna upozorenja</span></div>
+      ${flags.length===0?'<div class="empty">Nema aktivnih upozorenja.</div>':""}
+      ${flags.map(f=>`<div class="ai"><span class="ac">${f.cat}</span><span>${f.flag}</span></div>`).join("")}
+    </div>
+    <div class="sc">
+      <div class="st"><span>📍 Po lokaciji</span></div>
+      <div style="margin-bottom:.5rem"><div class="il">🏠 Glavna kuća</div><div class="iv">${cats.filter(c=>c.lokacija==="Glavna kuća").map(c=>c.name).join(", ")}</div></div>
+      <div><div class="il">🌿 Ljetna</div><div class="iv">${cats.filter(c=>c.lokacija==="Ljetna").map(c=>c.name).join(", ")}</div></div>
+    </div>
+    <div class="sc">
+      <div class="st"><span>📖 Nedavni zapisi</span></div>
+      ${recent.length===0?'<div class="empty">Još nema zabilježenih unosa.</div>':""}
+      ${recent.map(l=>{ const c=state.cats.find(c=>c.id===l.catId); return `
+        <div class="le"><div class="lm">
+          <span class="lcb">${c?.emoji} ${c?.name}</span>
+          <span class="ld">${l.datum}</span>
+          <span class="lcat c${l.kategorija}">${l.kategorija}</span>
+        </div><div>${l.biljeska}</div></div>`; }).join("")}
+    </div>
+    <div class="sc">
+      <div class="st"><span>💸 Pregled troškova — sve mačke</span></div>
+      ${(() => {
+        const allExp = state.cats.flatMap(c=>(c.troskovi||[]).map(t=>({...t,catName:c.name,catEmoji:c.emoji})));
+        const sorted = [...allExp].sort((a,b)=>b.datum.localeCompare(a.datum)).slice(0,15);
+        const total = allExp.reduce((s,t)=>s+parseFloat(t.iznos||0),0);
+        if (!allExp.length) return '<div class="empty">Još nema zabilježenih troškova.</div>';
+        return sorted.map(t=>`
+          <div class="exp-row">
+            <span style="color:var(--rust);font-size:.72rem;min-width:82px">${t.datum}</span>
+            <span class="lcb">${t.catEmoji} ${t.catName}</span>
+            <span class="exp-cat">${t.kategorija}</span>
+            <span style="flex:1;font-size:.78rem">${t.opis}</span>
+            <span class="exp-amt">${t.iznos} €</span>
+          </div>`).join("") + `<div class="exp-total">Sveukupno: ${total.toFixed(2)} €</div>`;
+      })()}
+    </div>
+    <div class="sc">
+      <div class="st"><span>💊 Trenutno na lijekovima</span></div>
+      ${(() => {
+        const onMeds = state.cats.filter(c=>(c.lijekovi||[]).length>0);
+        if (!onMeds.length) return '<div class="empty">Nijedna mačka trenutno nije na lijekovima.</div>';
+        return onMeds.map(c=>`
+          <div style="margin-bottom:.6rem">
+            <div style="font-weight:600;color:var(--bark);font-size:.83rem;margin-bottom:.3rem">${c.emoji} ${c.name}</div>
+            ${c.lijekovi.map(m=>`<div class="med-active-row" style="margin-bottom:.3rem">
+              <div style="flex:1"><div class="med-name">💊 ${m.naziv}</div>
+              ${m.doza?`<div style="font-size:.74rem;color:var(--rust)">${m.doza}</div>`:""}
+              </div></div>`).join("")}
+          </div>`).join("");
+      })()}
+    </div>
+    <div class="sc">
+      <div class="st"><span>💉 Nadolazeća cjepiva i tretmani</span></div>
+      ${(() => {
+        const now = new Date();
+        const upcoming = state.cats.flatMap(c=>[
+          ...(c.cjepiva||[]).filter(v=>v.sljedeci).map(v=>({naziv:v.naziv,datum:v.sljedeci,catName:c.name,catEmoji:c.emoji,tip:"Cjepivo"})),
+          ...(c.paraziti||[]).filter(p=>p.sljedeci).map(p=>({naziv:p.proizvod,datum:p.sljedeci,catName:c.name,catEmoji:c.emoji,tip:"Paraziti"}))
+        ]).filter(x=>x.datum).sort((a,b)=>a.datum.localeCompare(b.datum)).slice(0,10);
+        if (!upcoming.length) return '<div class="empty">Nema nadolazećih tretmana.</div>';
+        return upcoming.map(x=>{
+          const diff=Math.round((new Date(x.datum)-now)/(1000*60*60*24));
+          const cls=diff<0?"vax-overdue":diff<14?"vax-soon":"vax-ok";
+          const lbl=diff<0?`Zakasnilo ${Math.abs(diff)}d`:diff===0?"Danas":`Za ${diff}d`;
+          return `<div class="vax-row">
+            <span class="lcb">${x.catEmoji} ${x.catName}</span>
+            <span class="vax-name" style="min-width:100px">${x.naziv}</span>
+            <span style="font-size:.72rem;color:var(--rust);font-style:italic">${x.datum}</span>
+            <span class="vax-due ${cls}">${lbl}</span>
+          </div>`;
+        }).join("");
+      })()}
+    </div>`;
+}
+
+// ── DNEVNIK ───────────────────────────────────────────────────────────────
+function renderDnevnik() {
+  const f = state.logFilter;
+  const filtered = f==="Sve" ? state.logs : state.logs.filter(l=>l.kategorija===f);
+  const sorted = [...filtered].reverse();
+  return `
+    <div class="fbs">
+      ${["Sve",...KATS].map(k=>`<button class="fb${f===k?" active":""}" onclick="setLogFilter('${k}')">${k}</button>`).join("")}
+    </div>
+    <div class="sc">
+      <div class="st"><span>📖 Dnevnik — svi zapisi</span></div>
+      ${sorted.length===0?`<div class="empty">Nema zapisa${f!=="Sve"?` za kategoriju "${f}"`:""}.</div>`:""}
+      ${sorted.map(l=>{ const c=state.cats.find(c=>c.id===l.catId); return `
+        <div class="le"><div class="lm">
+          <span class="lcb">${c?.emoji} ${c?.name}</span>
+          <span class="ld">${l.datum}</span>
+          <span class="lcat c${l.kategorija}">${l.kategorija}</span>
+          <button class="bd" style="margin-left:auto" onclick="deleteLog('${l.id}')">✕</button>
+        </div><div>${l.biljeska}</div></div>`; }).join("")}
+    </div>`;
+}
+function setLogFilter(f) { state.logFilter=f; render(); }
+
+// ── KALENDAR ──────────────────────────────────────────────────────────────
+function renderKalendar() {
+  const y = state.calYear, m = state.calMonth;
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const firstDow = new Date(y,m,1).getDay();
+  const offset = firstDow === 0 ? 6 : firstDow - 1;
+  const td = todayStr();
+
+  function ds(d) { return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`; }
+  function evOnDay(d) { return state.events.filter(e=>e.datum===ds(d)); }
+
+  const cells = [];
+  for(let i=0;i<offset;i++) cells.push(null);
+  for(let d=1;d<=daysInMonth;d++) cells.push(d);
+
+  const upcoming = [...state.events].filter(e=>e.datum>=td).sort((a,b)=>a.datum.localeCompare(b.datum)).slice(0,10);
+  const past = [...state.events].filter(e=>e.datum<td).sort((a,b)=>b.datum.localeCompare(a.datum)).slice(0,5);
+
+  return `
+    <div class="sc">
+      <div class="cal-hdr">
+        <button class="cal-nav" onclick="calNav(-1)">‹</button>
+        <div class="cal-month">${MONTHS[m]} ${y}</div>
+        <button class="cal-nav" onclick="calNav(1)">›</button>
+      </div>
+      <div class="cal-grid">
+        ${DAYS.map(d=>`<div class="cdn">${d}</div>`).join("")}
+        ${cells.map(d => {
+          if (d===null) return `<div class="cd empty"></div>`;
+          const evs = evOnDay(d);
+          const dayS = ds(d);
+          return `<div class="cd${dayS===td?" today":""}">
+            <div class="cdn2">${d}</div>
+            ${evs.slice(0,2).map(e=>`<span class="cev">${e.naslov}</span>`).join("")}
+            ${evs.length>2?`<span style="font-size:.5rem;color:var(--rust)">+${evs.length-2}</span>`:""}
+          </div>`;
+        }).join("")}
+      </div>
+      ${state.showEventForm ? `
+        <div class="lf">
+          <div class="fr">
+            <input type="date" id="evdat" value="${today()}">
+            <select id="evkat">${KATS.map(k=>`<option>${k}</option>`).join("")}</select>
+          </div>
+          <input type="text" id="evnaslov" placeholder="Naslov događaja">
+          <select id="evcatid">
+            <option value="">— Sve mačke —</option>
+            ${state.cats.map(c=>`<option value="${c.id}">${c.emoji} ${c.name}</option>`).join("")}
+          </select>
+          <textarea id="evbil" placeholder="Bilješka (neobavezno)"></textarea>
+          <div style="display:flex;gap:.4rem">
+            <button class="btn bp" onclick="submitEvent()">Spremi</button>
+            <button class="btn bs" onclick="toggleForm('event')">Odustani</button>
+          </div>
+        </div>` :
+        `<button class="btn bp" onclick="toggleForm('event')">+ Dodaj događaj</button>`
+      }
+    </div>
+    ${upcoming.length>0?`
+      <div class="sc">
+        <div class="st"><span>📅 Nadolazeći događaji</span></div>
+        ${upcoming.map(e=>{ const c=state.cats.find(c=>String(c.id)===String(e.catId)); return `
+          <div class="ev-item">
+            <span class="ev-date">${e.datum}</span>
+            <div style="flex:1">
+              <div style="font-weight:600;color:var(--bark);font-size:.83rem">${e.naslov}</div>
+              ${c?`<div style="font-size:.73rem;color:var(--rust)">${c.emoji} ${c.name}</div>`:""}
+              ${e.biljeska?`<div style="font-size:.76rem;margin-top:.12rem">${e.biljeska}</div>`:""}
+            </div>
+            <button class="bd" onclick="deleteEvent('${e.id}')">✕</button>
+          </div>`; }).join("")}
+      </div>`:""}
+    ${past.length>0?`
+      <div class="sc">
+        <div class="st"><span>🕓 Prošli događaji</span></div>
+        ${past.map(e=>{ const c=state.cats.find(c=>String(c.id)===String(e.catId)); return `
+          <div class="ev-item" style="opacity:.7">
+            <span class="ev-date">${e.datum}</span>
+            <div style="flex:1">
+              <div style="font-weight:600;color:var(--bark);font-size:.83rem">${e.naslov}</div>
+              ${c?`<div style="font-size:.73rem;color:var(--rust)">${c.emoji} ${c.name}</div>`:""}
+            </div>
+            <button class="bd" onclick="deleteEvent('${e.id}')">✕</button>
+          </div>`; }).join("")}
+      </div>`:""}
+    ${state.events.length===0&&!state.showEventForm?'<div class="sc"><div class="empty">Još nema događaja. Dodajte prvi klikom na gumb iznad.</div></div>':""}
+  `;
+}
+function calNav(dir) {
+  let m = state.calMonth + dir;
+  let y = state.calYear;
+  if(m<0){m=11;y--;}
+  if(m>11){m=0;y++;}
+  state.calMonth=m; state.calYear=y;
+  render();
+}
+function submitEvent() {
+  const naslov = document.getElementById("evnaslov").value.trim();
+  if (!naslov) return;
+  state.events.push({id:uid(),datum:document.getElementById("evdat").value,naslov,kategorija:document.getElementById("evkat").value,catId:document.getElementById("evcatid").value,biljeska:document.getElementById("evbil").value});
+  state.showEventForm=false;
+  save(); render();
+}
+function deleteEvent(id) { state.events=state.events.filter(e=>e.id!==id); save(); render(); }
+
+// ── HIJERARHIJA ───────────────────────────────────────────────────────────
+function renderHijerarhija() {
+  const house = [...state.cats.filter(c=>c.lokacija==="Glavna kuća")].sort((a,b)=>a.hijerarhija-b.hijerarhija);
+  const ljetna = [...state.cats.filter(c=>c.lokacija==="Ljetna")].sort((a,b)=>a.hijerarhija-b.hijerarhija);
+  const row = (c,i) => `
+    <div class="hr-row">
+      <span class="hr-rank">${i+1}</span>
+      <span style="font-size:1.05rem">${c.emoji}</span>
+      <span class="hr-name">${c.name}</span>
+      <span class="hr-lbl">${c.hijerarhijaLabel}</span>
+    </div>`;
+  return `
+    <div class="sc">
+      <div class="st"><span>👑 Hijerarhija — Glavna kuća</span></div>
+      ${house.map(row).join("")}
+    </div>
+    <div class="sc">
+      <div class="st"><span>🌿 Hijerarhija — Ljetna</span></div>
+      ${ljetna.map(row).join("")}
+    </div>
+    <div class="sc">
+      <div class="st"><span>💬 Bilješke o odnosima</span></div>
+      <div style="font-size:.82rem;line-height:1.9">
+        <p>🖤 <strong>Crni</strong> — izbjegava gotovo sve; iznimke su Pero Jr. i (jednosmjerno) Pero</p>
+        <p>🎭 <strong>Crno Bijeli</strong> — slaže se sa svima osim s Crnom; par s Mišom</p>
+        <p>🧡 <strong>Lino</strong> — konfliktna faza zbog hormona; poboljšanje očekivano nakon kastracije</p>
+        <p>🌿☀️ <strong>Maćka & Maćak</strong> — stabilna dinamika; ona vodi, on slijedi</p>
+      </div>
+    </div>`;
+}
+
+// ── VET & EMERGENCY HELPERS ──────────────────────────────────────────────
+function renderVetCard(c) {
+  const gv = state.globalVet || {};
+  const cv = c.vet || {};
+  const activeVet = (cv.ime) ? cv : gv;
+  const hasVet = activeVet.ime;
+  const isOverride = cv.ime ? true : false;
+  return `
+    ${hasVet ? `<div class="vet-card">
+      <div class="vet-name">🏥 ${activeVet.ime}</div>
+      <div class="vet-info">
+        ${activeVet.telefon ? `📞 <a href="tel:${activeVet.telefon}">${activeVet.telefon}</a><br>` : ""}
+        ${activeVet.adresa ? `📍 ${activeVet.adresa}<br>` : ""}
+        ${activeVet.email ? `✉️ <a href="mailto:${activeVet.email}">${activeVet.email}</a>` : ""}
+      </div>
+      ${isOverride ? `<div style="font-size:.7rem;color:var(--rust);margin-top:.4rem;font-style:italic">Individualni veterinar ove mačke</div>` : `<div style="font-size:.7rem;color:var(--rust);margin-top:.4rem;font-style:italic">Dijeljeni veterinar (globalni)</div>`}
+    </div>` : '<div class="empty">Veterinar nije postavljen.</div>'}
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem">
+      <button class="be" onclick="toggleForm('vetcat')">✏️ ${isOverride ? "Uredi individualni vet" : "Dodaj individualni vet"}</button>
+      ${isOverride ? `<button class="bd" onclick="clearCatVet(${c.id})">Ukloni individualni</button>` : ""}
+      <button class="be" onclick="toggleForm('vet')">🌐 Uredi globalni vet</button>
+    </div>
+    ${state.showVetCatForm ? `
+      <div class="lf" style="margin-top:.6rem">
+        <input type="text" id="vcime" placeholder="Ime veterinara / klinike" value="${cv.ime||""}">
+        <input type="text" id="vctel" placeholder="Telefon" value="${cv.telefon||""}">
+        <input type="text" id="vcadr" placeholder="Adresa" value="${cv.adresa||""}">
+        <input type="text" id="vceml" placeholder="Email" value="${cv.email||""}">
+        <div style="display:flex;gap:.4rem">
+          <button class="btn bp" onclick="saveCatVet(${c.id})">Spremi</button>
+          <button class="btn bs" onclick="toggleForm('vetcat')">Odustani</button>
+        </div>
+      </div>` : ""}
+    ${state.showVetForm ? `
+      <div class="lf" style="margin-top:.6rem">
+        <div style="font-size:.76rem;color:var(--rust);margin-bottom:.4rem">Globalni veterinar (vrijedi za sve mačke bez individualnog)</div>
+        <input type="text" id="vgime" placeholder="Ime veterinara / klinike" value="${gv.ime||""}">
+        <input type="text" id="vgtel" placeholder="Telefon" value="${gv.telefon||""}">
+        <input type="text" id="vgadr" placeholder="Adresa" value="${gv.adresa||""}">
+        <input type="text" id="vgeml" placeholder="Email" value="${gv.email||""}">
+        <div style="display:flex;gap:.4rem">
+          <button class="btn bp" onclick="saveGlobalVet()">Spremi</button>
+          <button class="btn bs" onclick="toggleForm('vet')">Odustani</button>
+        </div>
+      </div>` : ""}
+  `;
+}
+
+function renderEmergencyCard(c) {
+  const gv = state.globalVet || {};
+  const cv = c.vet || {};
+  const vet = cv.ime ? cv : gv;
+  const catWeights = state.weights[c.id] || [];
+  const latestW = catWeights.length ? catWeights[catWeights.length-1].value : c.tezina;
+  const activeMeds = (c.lijekovi||[]).map(m=>m.naziv+(m.doza?" ("+m.doza+")":"")).join(", ") || "—";
+  const flags = (c.zastave||[]).join(" | ") || "—";
+  return `
+    <div class="emergency-card" id="em-${c.id}">
+      <div class="em-title">🆘 HITNA KARTICA — ${c.name}</div>
+      <div class="em-row"><span class="em-label">Spol:</span><span class="em-val">${c.spol} · ${c.sterilizirana?(c.spol==="Ženka"?"Sterilizirana":"Kastriran"):"Nije steriliziran/a"}</span></div>
+      <div class="em-row"><span class="em-label">Težina:</span><span class="em-val">${latestW ? latestW+" kg" : "—"}</span></div>
+      <div class="em-row"><span class="em-label">Rođendan:</span><span class="em-val">${c.rodjendan||"—"}</span></div>
+      <div class="em-row"><span class="em-label">Aktivni lijekovi:</span><span class="em-val">${activeMeds}</span></div>
+      <div class="em-row"><span class="em-label">Upozorenja:</span><span class="em-val">${flags}</span></div>
+      <div class="em-row"><span class="em-label">Alergije/izb.:</span><span class="em-val">${c.diet&&c.diet.izbjegavati?c.diet.izbjegavati:"—"}</span></div>
+      ${vet.ime ? `<div class="em-row" style="margin-top:.5rem;border-top:1px solid rgba(255,255,255,.2);padding-top:.5rem"><span class="em-label">Veterinar:</span><span class="em-val">${vet.ime}${vet.telefon?" · "+vet.telefon:""}</span></div>` : ""}
+    </div>`;
+}
+
+function printEmergencyCard(catId) {
+  window.print();
+}
+
+// ── DIET / VAX / MED ACTIONS ─────────────────────────────────────────────
+function submitAppetite(catId) {
+  const dat = document.getElementById("apdat").value;
+  const ocj = parseInt(document.getElementById("apocj").value);
+  const bil = document.getElementById("apbil").value;
+  if (!state.appetiteLogs) state.appetiteLogs = [];
+  state.appetiteLogs.push({id:uid(), catId, datum:dat, ocjena:ocj, biljeska:bil});
+  state.showAppetiteForm = false;
+  save(); render();
+}
+function submitVax(catId) {
+  const naziv = document.getElementById("vaxnaziv").value.trim();
+  if (!naziv) return;
+  const cat = state.cats.find(c=>c.id===catId);
+  if (!cat.cjepiva) cat.cjepiva = [];
+  cat.cjepiva.push({id:uid(), naziv, datum:document.getElementById("vaxdat").value, sljedeci:document.getElementById("vaxslj").value});
+  if (state.selected&&state.selected.id===catId) state.selected=cat;
+  state.showVaxForm = false;
+  save(); render();
+}
+function deleteVax(catId, i) {
+  const cat = state.cats.find(c=>c.id===catId);
+  cat.cjepiva.splice(i,1);
+  if (state.selected&&state.selected.id===catId) state.selected=cat;
+  save(); render();
+}
+function submitMedActive(catId) {
+  const naziv = document.getElementById("mednaziv").value.trim();
+  if (!naziv) return;
+  const cat = state.cats.find(c=>c.id===catId);
+  if (!cat.lijekovi) cat.lijekovi = [];
+  cat.lijekovi.push({id:uid(), naziv, doza:document.getElementById("meddoza").value, od:document.getElementById("medod").value, do:document.getElementById("meddo").value, biljeska:document.getElementById("medbil").value});
+  if (state.selected&&state.selected.id===catId) state.selected=cat;
+  state.showMedForm = false;
+  save(); render();
+}
+function deleteMedActive(catId, i) {
+  const cat = state.cats.find(c=>c.id===catId);
+  cat.lijekovi.splice(i,1);
+  if (state.selected&&state.selected.id===catId) state.selected=cat;
+  save(); render();
+}
+
+function submitPar(catId) {
+  const pro = document.getElementById("parpro").value.trim();
+  if (!pro) return;
+  const cat = state.cats.find(c=>c.id===catId);
+  if (!cat.paraziti) cat.paraziti=[];
+  cat.paraziti.push({id:uid(),proizvod:pro,tip:document.getElementById("partype").value,datum:document.getElementById("pardat").value,sljedeci:document.getElementById("parslj").value});
+  if (state.selected&&state.selected.id===catId) state.selected=cat;
+  state.showParForm=false; save(); render();
+}
+function deletePar(catId,i) {
+  const cat=state.cats.find(c=>c.id===catId);
+  cat.paraziti.splice(i,1);
+  if(state.selected&&state.selected.id===catId) state.selected=cat;
+  save(); render();
+}
+function submitExp(catId) {
+  const izn=document.getElementById("expizn").value;
+  const opis=document.getElementById("expopis").value.trim();
+  if (!izn||!opis) return;
+  const cat=state.cats.find(c=>c.id===catId);
+  if (!cat.troskovi) cat.troskovi=[];
+  cat.troskovi.push({id:uid(),datum:document.getElementById("expdat").value,kategorija:document.getElementById("expkat").value,opis,iznos:parseFloat(izn).toFixed(2)});
+  if(state.selected&&state.selected.id===catId) state.selected=cat;
+  state.showExpForm=false; save(); render();
+}
+function deleteExp(catId,eid) {
+  const cat=state.cats.find(c=>c.id===catId);
+  cat.troskovi=cat.troskovi.filter(t=>t.id!==eid);
+  if(state.selected&&state.selected.id===catId) state.selected=cat;
+  save(); render();
+}
+function saveGlobalVet() {
+  state.globalVet={ime:document.getElementById("vgime").value,telefon:document.getElementById("vgtel").value,adresa:document.getElementById("vgadr").value,email:document.getElementById("vgeml").value};
+  state.showVetForm=false; save(); render();
+}
+function saveCatVet(catId) {
+  const cat=state.cats.find(c=>c.id===catId);
+  cat.vet={ime:document.getElementById("vcime").value,telefon:document.getElementById("vctel").value,adresa:document.getElementById("vcadr").value,email:document.getElementById("vceml").value};
+  if(state.selected&&state.selected.id===catId) state.selected=cat;
+  state.showVetCatForm=false; save(); render();
+}
+function clearCatVet(catId) {
+  const cat=state.cats.find(c=>c.id===catId);
+  cat.vet={ime:"",telefon:"",adresa:"",email:""};
+  if(state.selected&&state.selected.id===catId) state.selected=cat;
+  save(); render();
+}
+
+// ── BUDGET ───────────────────────────────────────────────────────────────
+function renderBudzet() {
+  var BUDGET = [
+    {kategorija:"Hrana", stavke:[
+      {naziv:"Feringa mokra hrana (wet)", godisnje:3832, napomena:"1.5 konzervi/dan x 365"},
+      {naziv:"Purizon suha hrana (kibble)", godisnje:396, napomena:"~105g/dan x 365"},
+    ]},
+    {kategorija:"Prevencija i zdravlje", stavke:[
+      {naziv:"Nexgard Combo (12x godisnje)", godisnje:2784, napomena:"29 KM x 12 mj x 8 macaka"},
+      {naziv:"Tableta za trakavice (2x godisnje)", godisnje:40, napomena:"2.50 KM x 2 x 8 macaka"},
+      {naziv:"Krvna slika", godisnje:400, napomena:"50 KM x 8 macaka"},
+      {naziv:"Kit za uzorak urina", godisnje:232, napomena:"29 KM x 8 macaka"},
+      {naziv:"Lab analiza urina", godisnje:160, napomena:"~20 KM x 8 macaka"},
+      {naziv:"Cjepivo protiv bjesnoce (3-godisnje)", godisnje:80, napomena:"30 KM / 3 x 8 macaka"},
+      {naziv:"Klnicki pregled", godisnje:0, napomena:"Besplatno uz vet posjetu"},
+    ]},
+    {kategorija:"Postelj i higijena", stavke:[
+      {naziv:"Cat's Best drvena prostirka 40L (2x/mj)", godisnje:2160, napomena:"90 KM x 2 vrece x 12 mj"},
+    ]},
+  ];
+
+  var totalHrana = BUDGET[0].stavke.reduce(function(s,x){return s+x.godisnje;},0);
+  var totalZdravlje = BUDGET[1].stavke.reduce(function(s,x){return s+x.godisnje;},0);
+  var grandTotal = totalHrana + totalZdravlje;
+  var tjedno = Math.round(grandTotal/52);
+  var mjesecno = Math.round(grandTotal/12);
+  var poMackiMjesecno = Math.round(grandTotal/8/12);
+  var nexgardPct = Math.round(2784/grandTotal*100);
+  var hranaPct = Math.round(totalHrana/grandTotal*100);
+  var zdravljePct = Math.round(totalZdravlje/grandTotal*100);
+
+  var grupeHtml = "";
+  BUDGET.forEach(function(grupa) {
+    var grupaTotal = grupa.stavke.reduce(function(s,x){return s+x.godisnje;},0);
+    var stavkeHtml = "";
+    grupa.stavke.forEach(function(s) {
+      stavkeHtml += "<div class='exp-row'>" +
+        "<span style='flex:1;font-size:.82rem'>" + s.naziv + "</span>" +
+        "<span style='font-size:.7rem;color:var(--rust);font-style:italic;text-align:right;padding:0 .5rem'>" + s.napomena + "</span>" +
+        "<span class='exp-amt'>" + (s.godisnje > 0 ? s.godisnje + " KM" : "Besplatno") + "</span>" +
+        "</div>";
+    });
+    grupeHtml += "<div class='sc'>" +
+      "<div class='st'><span>" + grupa.kategorija + "</span>" +
+      "<span style='font-family:Playfair Display,serif;font-size:.95rem;color:var(--terracotta)'>" + grupaTotal + " KM</span></div>" +
+      stavkeHtml + "</div>";
+  });
+
+  return "<div class='sc'>" +
+    "<div class='st'><span>Godisnji budzet — sve macke</span></div>" +
+    "<div class='ov-grid' style='margin-bottom:1rem'>" +
+    "<div class='stat'><div class='sn'>" + grandTotal + " KM</div><div class='sl'>Godisnje ukupno</div></div>" +
+    "<div class='stat'><div class='sn'>" + tjedno + " KM</div><div class='sl'>Tjedno</div></div>" +
+    "<div class='stat'><div class='sn'>" + mjesecno + " KM</div><div class='sl'>Mjesecno</div></div>" +
+    "<div class='stat'><div class='sn'>" + poMackiMjesecno + " KM</div><div class='sl'>Po macki/mj.</div></div>" +
+    "</div></div>" +
+    grupeHtml +
+    "<div class='sc'><div class='st'><span>Rasclamba</span></div>" +
+    "<div class='exp-row'><span style='flex:1;font-size:.82rem'>Hrana</span><span class='exp-amt'>" + totalHrana + " KM</span><span style='font-size:.75rem;color:var(--rust);min-width:40px;text-align:right'>" + hranaPct + "%</span></div>" +
+    "<div class='exp-row'><span style='flex:1;font-size:.82rem'>Zdravlje & prevencija</span><span class='exp-amt'>" + totalZdravlje + " KM</span><span style='font-size:.75rem;color:var(--rust);min-width:40px;text-align:right'>" + zdravljePct + "%</span></div>" +
+    "<div class='exp-row' style='border-top:2px solid var(--sand);margin-top:.3rem;padding-top:.5rem'><span style='flex:1;font-size:.88rem;font-weight:600;color:var(--bark)'>UKUPNO</span><span class='exp-amt' style='font-size:.95rem'>" + grandTotal + " KM</span></div>" +
+    "<div style='margin-top:.8rem;padding:.7rem;background:var(--parchment);border-radius:8px;font-size:.76rem;color:var(--rust);font-style:italic;line-height:1.7'>" +
+    "Napomena: Procijenjene cijene 2025/2026. Nexgard Combo cini " + nexgardPct + "% ukupnih troskova. " +
+    "Lab analiza urina ~20 KM/macki (provjeriti s veterinarom). " +
+    "Nepredvideni vet troskovi nisu ukljuceni — preporucuje se fond za hitne slucajeve." +
+    "</div></div>";
+}
+
+// ── ROUND 3 HELPERS ──────────────────────────────────────────────────────
+function renderGrowthSection(c) {
+  const weights = state.weights[c.id] || [];
+  if (weights.length < 2) return "";
+  // Show growth chart for all cats with enough data points
+  return `
+    <div class="sc">
+      <div class="st"><span>📈 Graf rasta i težine</span></div>
+      <canvas id="gchart-${c.id}" width="600" height="100"></canvas>
+      <div style="font-size:.72rem;color:var(--rust);text-align:center;margin-top:.3rem;font-style:italic">
+        ${weights[0].datum} → ${weights[weights.length-1].datum} · ${weights.length} mjerenja
+      </div>
+    </div>`;
+}
+
+function drawGrowthChart(canvas, catId) {
+  const entries = state.weights[catId] || [];
+  if (entries.length < 2) return;
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const vals = entries.map(e => e.value);
+  const mn = Math.min(...vals) - 0.2, mx = Math.max(...vals) + 0.2;
+  ctx.clearRect(0, 0, W, H);
+  // Grid lines
+  ctx.strokeStyle = "#e8dcc8";
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = (i / 4) * H;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, "rgba(192,113,79,0.25)");
+  grad.addColorStop(1, "rgba(192,113,79,0)");
+  ctx.beginPath();
+  entries.forEach((e, i) => {
+    const x = (i / (entries.length - 1)) * W;
+    const y = H - ((e.value - mn) / (mx - mn)) * H;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+  // Line
+  ctx.strokeStyle = "#c0714f"; ctx.lineWidth = 2.5;
+  ctx.lineJoin = "round"; ctx.lineCap = "round";
+  ctx.beginPath();
+  entries.forEach((e, i) => {
+    const x = (i / (entries.length - 1)) * W;
+    const y = H - ((e.value - mn) / (mx - mn)) * H;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  // Dots + labels
+  entries.forEach((e, i) => {
+    const x = (i / (entries.length - 1)) * W;
+    const y = H - ((e.value - mn) / (mx - mn)) * H;
+    ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = "#c0714f"; ctx.fill();
+    ctx.fillStyle = "#6b4423"; ctx.font = "10px Lora,serif";
+    ctx.textAlign = "center";
+    ctx.fillText(e.value + "kg", x, y - 8);
+  });
+}
+
+function daysUntilNextBirthday(dateStr) {
+  if (!dateStr || dateStr === "Nepoznat") return null;
+  // Try to parse Croatian date format or ISO
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  let month = -1, day = -1;
+  // ISO format
+  if (/^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
+    const d = new Date(dateStr);
+    month = d.getMonth(); day = d.getDate();
+  }
+  // Croatian months
+  const hrMonths = {"siječnja":0,"veljače":1,"ožujka":2,"travnja":3,"svibnja":4,"lipnja":5,"srpnja":6,"kolovoza":7,"rujna":8,"listopada":9,"studenog":10,"prosinca":11,
+    "siječanj":0,"veljača":1,"ožujak":2,"travanj":3,"svibanj":4,"lipanj":5,"srpanj":6,"kolovoz":7,"rujan":8,"listopad":9,"studeni":10,"prosinac":11};
+  const parts = dateStr.toLowerCase().split(/[\s.]+/);
+  parts.forEach((p, i) => {
+    if (hrMonths[p] !== undefined) { month = hrMonths[p]; day = parseInt(parts[i-1]||parts[i+1]); }
+  });
+  if (month === -1 || !day) return null;
+  let next = new Date(thisYear, month, day);
+  if (next < now) next = new Date(thisYear + 1, month, day);
+  const diff = Math.round((next - now) / (1000 * 60 * 60 * 24));
+  return diff;
+}
+
+function renderBirthdayTab() {
+  const cats = state.cats;
+  const items = cats.map(c => {
+    const bDays = daysUntilNextBirthday(c.rodjendan);
+    const gDays = daysUntilNextBirthday(c.gotchaDay);
+    return { c, bDays, gDays };
+  }).filter(x => x.bDays !== null || x.gDays !== null);
+
+  const sorted = [...items].sort((a, b) => {
+    const aMin = Math.min(a.bDays ?? 999, a.gDays ?? 999);
+    const bMin = Math.min(b.bDays ?? 999, b.gDays ?? 999);
+    return aMin - bMin;
+  });
+
+  return `
+    <div class="sc">
+      <div class="st"><span>🎂 Rođendani i Gotcha dani</span></div>
+      ${sorted.length === 0 ? '<div class="empty">Dodajte datume rođendana u profile mačaka.</div>' : ""}
+      ${sorted.map(({c, bDays, gDays}) => {
+        let html = "";
+        if (bDays !== null) {
+          const isToday = bDays === 0;
+          html += `<div class="bday-card${isToday?" bday-today":""}">
+            <div class="bday-emoji">${isToday?"🎉":c.emoji}</div>
+            <div><div class="bday-name">${c.name}</div>
+            <div class="bday-sub">🎂 Rođendan · ${c.rodjendan}</div></div>
+            <div class="bday-days">${isToday?"DANAS! 🎉":bDays+"d"}</div>
+          </div>`;
+        }
+        if (gDays !== null) {
+          const isToday = gDays === 0;
+          html += `<div class="bday-card${isToday?" bday-today":""}">
+            <div class="bday-emoji">${isToday?"🎉":c.emoji}</div>
+            <div><div class="bday-name">${c.name}</div>
+            <div class="bday-sub">🏠 Gotcha Dan · ${c.gotchaDay}</div></div>
+            <div class="bday-days">${isToday?"DANAS! 🎉":gDays+"d"}</div>
+          </div>`;
+        }
+        return html;
+      }).join("")}
+    </div>
+    <div class="sc">
+      <div class="st"><span>💡 Savjet</span></div>
+      <p style="font-size:.82rem;line-height:1.7;color:var(--ink)">
+        Datumi se automatski izračunavaju iz podataka u profilu svake mačke.
+        Ako datum nije prikazan, dodajte ga u profil mačke klikom na ✏️ pored polja Rođendan ili Gotcha Dan.
+      </p>
+    </div>`;
+}
+
+// ── MOOD ACTIONS ──────────────────────────────────────────────────────────
+function submitMood(catId) {
+  const cat = state.cats.find(c => c.id === catId);
+  if (!cat.raspolozenje) cat.raspolozenje = [];
+  cat.raspolozenje.push({
+    id: uid(),
+    datum: document.getElementById("moodat").value,
+    ocjena: parseInt(document.getElementById("mooocj").value),
+    aktivnost: parseInt(document.getElementById("mooakt").value),
+    biljeska: document.getElementById("moobil").value
+  });
+  if (state.selected && state.selected.id === catId) state.selected = cat;
+  state.showMoodForm = false;
+  save(); render();
+}
+function deleteMood(catId, i) {
+  const cat = state.cats.find(c => c.id === catId);
+  cat.raspolozenje.splice(i, 1);
+  if (state.selected && state.selected.id === catId) state.selected = cat;
+  save(); render();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+load();
+render();
+</script>
+</body>
+</html>
